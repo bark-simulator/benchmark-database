@@ -1,0 +1,34 @@
+version: 2.1
+  jobs:
+    serialize:
+      docker:
+        - image: barksim/bark:latest
+      steps:
+        - checkout
+        - run:
+            name: Run Serializer
+            command: |
+              bash 
+              source ./utils/venv/bin/activate
+              bazel --host_jvm_args=-Xmx4g --host_jvm_args=-Xms512m run --jobs=1 //serialization/test:serialization_test
+
+    publish-github-release:
+      docker:
+        - image: cibuilds/github:0.10
+      steps:
+        - attach_workspace:
+            at: ./bazel-out/k8-fastbuild/bin/serialization/test/serialization_test.runfiles/benchmark_database/scenario_sets/serialized/
+        - run:
+            name: "Publish Release on GitHub"
+            command: |
+              VERSION=0.1
+              ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
+
+workflows:
+  version: 2.1
+  main:
+    jobs:
+      - serialize:
+      - publish-github-release:
+          requires:
+            - serialize
