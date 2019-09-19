@@ -12,7 +12,7 @@ from modules.runtime.scenario.scenario_generation.deterministic import Determini
 from modules.runtime.commons.parameters import ParameterServer
 import modules.runtime.scenario.scenario_generation 
 
-FILE_EXTENSION_SCENARIO_SET = ".bark_scenarios"
+FILE_EXTENSION_SCENARIO_SET = "bark_scenarios"
 
 
 

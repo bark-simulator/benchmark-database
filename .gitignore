@@ -140,6 +140,9 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+util/venv/*
+util/ghr/*
+
 tests/environment/hello-test\.cc
 
 modules/example_module/proto/tutorial/
