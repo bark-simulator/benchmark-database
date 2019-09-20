@@ -10,11 +10,11 @@ from modules.runtime.commons.parameters import ParameterServer
 
 class ImporterTests(unittest.TestCase):
     def test_highway_merging(self):
-        scenario_param_file =os.path.join("scenario_sets", "highway_merging", "ego_alone_on_right.json")
+        scenario_param_file =os.path.join("database","scenario_sets", "highway_merging", "ego_alone_on_right.json")
         param_server = ParameterServer(filename = scenario_param_file)
         serializer = Serializer(params=param_server)
 
-        serializer.dump(os.path.join("scenario_sets","serialized","highway_merging"))
+        serializer.dump(os.path.join("database", "scenario_sets", "highway_merging"))
         serializer.load()
         serializer.test()
 if __name__ == '__main__':

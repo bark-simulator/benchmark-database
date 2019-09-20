@@ -40,7 +40,8 @@ class Serializer:
         filename = os.path.join(dir, Serializer.scenario_file_name(
             self._set_name, self._num_scenarios, self._generator_seed
         ))
-        os.makedirs(os.path.dirname(filename))
+        if not os.path.exists(os.path.dirname(filename)):
+            os.makedirs(os.path.dirname(filename))
         self._scenario_generator.dump_scenario_list(filename)
         self._last_serialized_filename = filename
 

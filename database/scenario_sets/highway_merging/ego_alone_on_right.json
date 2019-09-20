@@ -60,7 +60,7 @@
             "NumScenarios": 1,
             "NumSets": 1,
             "UniformVehicleDistribution": {
-                "MapFilename": "maps/city_highway_straight.xodr",
+                "MapFilename": "database/maps/city_highway_straight.xodr",
                 "EgoGoalStart": [
                     5111.626,
                     5006.8305
