@@ -16,6 +16,6 @@ class ImporterTests(unittest.TestCase):
 
         scenario_set_serializer.dump(os.path.join("database", "scenario_sets", "highway_merging"))
         scenario_set_serializer.load()
-        scenario_set_serializer.test()
+        scenario_set_serializer.test(num_scenarios=1, num_steps=5)
 if __name__ == '__main__':
     unittest.main()

@@ -5,6 +5,7 @@
 
 import os
 import logging
+import random
 
 from modules.runtime.scenario.scenario_generation.scenario_generation import ScenarioGeneration
 from modules.runtime.scenario.scenario_generation.uniform_vehicle_distribution import UniformVehicleDistribution
@@ -14,7 +15,8 @@ import modules.runtime.scenario.scenario_generation
 
 FILE_EXTENSION_SCENARIO_SET = "bark_scenarios"
 
-# The ScenarioSetSerializer dumps, loads and tests all scenarios sets specified in one param file
+# The ScenarioSetSerializer dumps, loads and
+# tests all scenarios sets specified in one param file
 
 
 class ScenarioSetSerializer:
@@ -52,7 +54,7 @@ class ScenarioSetSerializer:
         self._scenario_generator = ScenarioGeneration()
         self._scenario_generator.load_scenario_list(filename=filename)
 
-    def test(self):
+    def test(self, num_scenarios, num_steps):
         if not self._scenario_generator:
             logging.error("No scenario generator initialized for testing")
             return
@@ -60,13 +62,14 @@ class ScenarioSetSerializer:
         logging.info("Testing {} with seed {} from generator {}".format(
             self._set_name, self._generator_seed, self._scenario_generator_name
         ))
-        for _ in range(0, self._num_scenarios): # run all scenarios
-            scenario, idx = self._scenario_generator.get_next_scenario()
+        for _ in range(0, num_scenarios ): # run all scenarios
+            scenario_idx = random.randint(0, self._num_scenarios-1)
+            scenario = self._scenario_generator.get_scenario(scenario_idx)
             world_state = scenario.get_world_state()
-            logging.info("Running scenario {} of {} in set {}".format(idx,
+            logging.info("Running scenario {} of {} in set {}".format(scenario_idx,
                                                                  self._scenario_generator.num_scenarios,
                                                                  self._set_name))
-            for _ in range(0, 100): # run a few steps for each scenario
+            for _ in range(0, num_steps): # run a few steps for each scenario
                 world_state.step(self._simulation_step_time)
 
 
