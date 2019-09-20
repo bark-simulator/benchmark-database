@@ -14,9 +14,10 @@ import modules.runtime.scenario.scenario_generation
 
 FILE_EXTENSION_SCENARIO_SET = "bark_scenarios"
 
+# The ScenarioSetSerializer dumps, loads and tests all scenarios sets specified in one param file
 
 
-class Serializer:
+class ScenarioSetSerializer:
     def __init__(self, params):
         self._params = params
         self._scenario_generator_name = self._params["Scenario"]["Generation"]["GeneratorName"]
@@ -37,7 +38,7 @@ class Serializer:
                 num_scenarios={}, random_seed={}, params=self._params)".format(self._scenario_generator_name,
                                                                      self._num_scenarios,
                                                                      self._generator_seed))
-        filename = os.path.join(dir, Serializer.scenario_file_name(
+        filename = os.path.join(dir, ScenarioSetSerializer.scenario_file_name(
             self._set_name, self._num_scenarios, self._generator_seed
         ))
         if not os.path.exists(os.path.dirname(filename)):

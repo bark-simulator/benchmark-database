@@ -6,7 +6,7 @@ version: 2.1
       steps:
         - checkout
         - run:
-            name: Run Serializer
+            name: Run ScenarioSetSerializer
             command: |
               bash ./util/setup_test_venv.sh
               source ./into_test_venv.sh

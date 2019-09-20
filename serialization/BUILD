@@ -1,6 +1,6 @@
 py_library(
-  name = "serializer",
-  srcs = ["serializer.py"],
+  name = "scenario_set_serializer",
+  srcs = ["scenario_set_serializer.py"],
   data = ['@bark_project//python:bark.so'],
   imports = ['../python/'],
   deps = ["@bark_project//modules/runtime/commons:parameters",
