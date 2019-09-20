@@ -14,6 +14,7 @@ class DatabaseSerializerTests(unittest.TestCase):
         # last params must be only passed for testing purposes not for release!
         dbs = DatabaseSerializer(test_scenarios=1, test_world_steps=10, serialize_scenarios=1)
         dbs.process("database")
+        dbs.release()
 
 
 if __name__ == '__main__':
