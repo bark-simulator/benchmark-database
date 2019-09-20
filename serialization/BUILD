@@ -10,3 +10,14 @@ py_library(
 )
 
 
+py_library(
+  name = "database_serializer",
+  srcs = ["database_serializer.py"],
+  data = ['@bark_project//python:bark.so'],
+  imports = ['../python/'],
+  deps = ["@bark_project//modules/runtime/commons:parameters",
+          ":scenario_set_serializer"],
+  visibility = ["//visibility:public"],
+)
+
+
