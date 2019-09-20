@@ -39,9 +39,8 @@ class BenchmarkDatabase:
                     logging.info("Found info dict {}".format(file))
                     with open(os.path.join(root,file), "rb") as f:
                         info_dict = pickle.load(f)
-                        print(info_dict)
                     self.dataframe = self.dataframe.append(info_dict, ignore_index=True)
-        print("The following scenario sets are available")
+        logging.info("The following scenario sets are available")
         print(self.dataframe.to_string())
 
     def get_scenario_generator(self, scenario_set_id):
