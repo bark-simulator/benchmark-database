@@ -4,7 +4,8 @@ py_library(
   data = ['@bark_project//python:bark.so'],
   imports = ['../python/'],
   deps = [
-      "@bark_project//modules/runtime/scenario/scenario_generation:scenario_generation"
+      "@bark_project//modules/runtime/scenario/scenario_generation:scenario_generation",
+      "//serialization:scenario_set_serializer"
     ],
   visibility = ["//visibility:public"],
 )
