@@ -6,6 +6,8 @@
 import os
 import logging
 import random
+import pickle
+
 
 from modules.runtime.scenario.scenario_generation.scenario_generation import ScenarioGeneration
 from modules.runtime.scenario.scenario_generation.uniform_vehicle_distribution import UniformVehicleDistribution
@@ -35,7 +37,14 @@ class ScenarioSetSerializer:
     def scenario_file_name(set_name, num_scenarios, seed):
         return "{}_scenarios{}_seed{}.{}".format(set_name, num_scenarios, seed, FILE_EXTENSION_SCENARIO_SET)
 
+    @staticmethod
+    def scenario_set_info_filename():
+        return "scenario_set_info"
+
     def dump(self, dir):
+        self._dump(dir, self._scenario_generator_name, self._num_scenarios, self._generator_seed)
+
+    def _dump(self, dir, generator, num_scenarios, seed, **kwargs):
         self._scenario_generator = eval("{}( \
                 num_scenarios={}, random_seed={}, params=self._params)".format(self._scenario_generator_name,
                                                                      self._num_scenarios,
@@ -47,6 +56,14 @@ class ScenarioSetSerializer:
             os.makedirs(os.path.dirname(filename))
         self._scenario_generator.dump_scenario_list(filename)
         self._last_serialized_filename = filename
+
+        info_dict = {"GeneratorName": generator, "NumScenarios": num_scenarios,
+                     "Seed": seed, "Serialized": filename, "Params": self._params.param_filename,
+                     **kwargs}
+
+        info_filename = os.path.join(dir, ScenarioSetSerializer.scenario_set_info_filename())
+        with open(info_filename, "wb") as f:
+            pickle.dump(info_dict , f)
 
     def load(self, filename=None):
         if not filename and self._last_serialized_filename:

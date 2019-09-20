@@ -9,6 +9,7 @@ import subprocess
 logging.getLogger().setLevel(logging.INFO)
 import argparse
 import zipfile
+import shutil
 
 from modules.runtime.commons.parameters import ParameterServer
 from serialization.scenario_set_serializer import ScenarioSetSerializer
@@ -58,13 +59,18 @@ class DatabaseSerializer:
     @staticmethod
     def _pack(database_dir, packed_file_name):
         logging.info('The following list of files will be released:')
-        zipf = zipfile.ZipFile(packed_file_name, 'w', zipfile.ZIP_DEFLATED)    
-        for root, dirs, files in os.walk(database_dir):
+        zipf = zipfile.ZipFile(packed_file_name, 'w', zipfile.ZIP_DEFLATED)
+        tmp_dir = "/tmp/database/"  
+        if os.path.exists(tmp_dir):
+            shutil.rmtree(tmp_dir)
+        shutil.copytree(database_dir, tmp_dir) # copy to resolve symlinks
+        for root, dirs, files in os.walk(tmp_dir):
             for file in files:
                 if file.endswith(".zip"):
                     continue # do not include our own created zip file
-                logging.info(os.path.join(root, file))
-                zipf.write(os.path.join(root, file))
+                zip_root = root.replace("/tmp/","")
+                logging.info(os.path.join(zip_root, file))
+                zipf.write(os.path.join(zip_root, file))
         logging.info("Packed release file {}".format(os.path.abspath(packed_file_name)))
 
     @staticmethod
@@ -98,4 +104,6 @@ class DatabaseSerializer:
             DatabaseSerializer._github_release(packed_file_name, version, github_token, delete)
         else:
             logging.info("Assuming local release as you did not provide a github token.")
+
+        return packed_file_name
 
