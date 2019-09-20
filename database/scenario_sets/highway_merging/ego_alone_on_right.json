@@ -50,14 +50,13 @@
         }
     },
     "integration_time_delta": 0.009999999776482582,
-    "NumScenarios": 100,
     "Scenario": {
         "Generation": {
             "GeneratorName": "UniformVehicleDistribution",
             "GeneratorSeed": 1000,
             "SetName": "ego_alone_on_right",
             "SetDescription": "Ego vehicle is the only vehicle on the right lane. Must merge to left lane where it is crowded with IDM vehicles",
-            "NumScenarios": 1000,
+            "NumScenarios": 1,
             "NumSets": 1,
             "UniformVehicleDistribution": {
                 "MapFilename": "database/maps/city_highway_straight.xodr",

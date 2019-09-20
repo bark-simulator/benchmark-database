@@ -5,6 +5,8 @@
 
 import os
 import logging
+import subprocess
+logging.getLogger().setLevel(logging.INFO)
 import argparse
 import zipfile
 
@@ -17,27 +19,27 @@ FILE_EXTENSION_SCENARIO_SET = "bark_scenarios"
 
 
 class DatabaseSerializer:
-    def __init__(self, test_scenarios, test_world_steps, serialize_scenarios=None):
+    def __init__(self, test_scenarios, test_world_steps, num_serialize_scenarios=None):
         self._test_scenarios = test_scenarios
         self._test_world_steps = test_world_steps
         self._database_dir = None
 
         # provides a way to reduce the generated scenarios for each param file for unittesting
-        self._serialize_scenarios = serialize_scenarios 
+        self._num_serialize_scenarios = num_serialize_scenarios 
 
     def _process_folder(self, dir):
         for root, dirs, files in os.walk(dir):
             for name in files:
-                if name.endswith("*.json"):
-                    self._process_json_paramfile(name)
+                if name.endswith(".json"):
+                    self._process_json_paramfile(os.path.join(root, name))
             for dir in dirs:
                 self._process_folder(dir)
 
     def _process_json_paramfile(self, param_filename):
         param_server = ParameterServer(filename = param_filename)
-        if self._serialized_scenarios:
+        if self._num_serialize_scenarios:
             # set this down to reduce test runtime !Only for Unittesting!
-            param_server["Scenario"]["Generation"]["NumScenarios"] = self._serialize_scenarios 
+            param_server["Scenario"]["Generation"]["NumScenarios"] = self._num_serialize_scenarios 
 
         scenario_set_serializer = ScenarioSetSerializer(params=param_server)
         scenario_set_serializer.dump(os.path.dirname(param_filename))
@@ -55,51 +57,45 @@ class DatabaseSerializer:
 
     @staticmethod
     def _pack(database_dir, packed_file_name):
+        logging.info('The following list of files will be released:')
         zipf = zipfile.ZipFile(packed_file_name, 'w', zipfile.ZIP_DEFLATED)    
-        for root, dirs, files in os.walk(self._database_dir):
+        for root, dirs, files in os.walk(database_dir):
             for file in files:
-                ziph.write(os.path.join(root, file))
+                if file.endswith(".zip"):
+                    continue # do not include our own created zip file
+                logging.info(os.path.join(root, file))
+                zipf.write(os.path.join(root, file))
+        logging.info("Packed release file {}".format(os.path.abspath(packed_file_name)))
 
     @staticmethod
-    def _release(database_file, version):
-        pass
+    def _github_release(database_file, version, github_token, delete):
+        if delete:
+            delete_cmd = "-delete"
+        else:
+            delete_cmd = ""
+        print(os.getcwd())
+        ghr_command = os.path.abspath("external/ghr")
+        full_file_path = os.path.abspath(database_file)
+        os.chdir(ghr_command)
+        ghr_full_command = "./ghr -t {} -u bark-simulator -r benchmark-database {} {} {}".format(
+           github_token, delete_cmd, version, full_file_path)
+        out = subprocess.call(ghr_full_command, shell=True)
+        logging.info("Release output {}".format(out))
 
-    def release(self, version, github_token=None):
-        if self._serialized_scenarios:
-            logging.error("Do not set down the number of serialized scenarios in a release \
+    def release(self, version, github_token=None, delete=False):
+        if self._num_serialize_scenarios:
+            logging.warning("Do not set down the number of serialized scenarios in a release \
                     -> set serialized_scenarios=None")
-            return
 
         if not self._database_dir:
             logging.error("No database dir given, call process first.")
-        
-        # printing the list of all files to be released
-        logging.info('The following list of files will be released:')
-        # ziph is zipfile handle
-        for root, dirs, files in os.walk(self._database_dir):
-            for file in files:
-                logging.info(file)
-
-        answer = input("Do you want to pack and release these files? [y/Y]")
-        if answer.lower() != "y":
-            print("Release canceled...")
-            return
 
         packed_file_name = os.path.join(self._database_dir,"{}.{}".format(
-            DatabaseSerializer._release_file_name(version, "zip")))
+            DatabaseSerializer._release_file_name(version), "zip"))
         DatabaseSerializer._pack(self._database_dir, packed_file_name)
 
         if github_token:
-            DatabaseSerializer._release()
+            DatabaseSerializer._github_release(packed_file_name, version, github_token, delete)
         else:
-            logging.info("Assuming release test. No actual release takes place.")
+            logging.info("Assuming local release as you did not provide a github token.")
 
-        
-
-
-
-
-
-        
-    
-  

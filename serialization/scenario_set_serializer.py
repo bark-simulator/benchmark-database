@@ -33,7 +33,7 @@ class ScenarioSetSerializer:
     
     @staticmethod
     def scenario_file_name(set_name, num_scenarios, seed):
-        return "{}_{}_{}.{}".format(set_name, num_scenarios, seed, FILE_EXTENSION_SCENARIO_SET)
+        return "{}_scenarios{}_seed{}.{}".format(set_name, num_scenarios, seed, FILE_EXTENSION_SCENARIO_SET)
 
     def dump(self, dir):
         self._scenario_generator = eval("{}( \

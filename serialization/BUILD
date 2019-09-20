@@ -13,10 +13,22 @@ py_library(
 py_library(
   name = "database_serializer",
   srcs = ["database_serializer.py"],
-  data = ['@bark_project//python:bark.so'],
+  data = ['@bark_project//python:bark.so',
+          "@ghr//:ghr_binary"],
   imports = ['../python/'],
   deps = ["@bark_project//modules/runtime/commons:parameters",
           ":scenario_set_serializer"],
+  visibility = ["//visibility:public"],
+)
+
+
+py_binary(
+  name = "release",
+  srcs = ["release.py"],
+  data = ['@bark_project//python:bark.so',
+          '//database:database'],
+  imports = ['../python/'],
+  deps = [":database_serializer"],
   visibility = ["//visibility:public"],
 )
 

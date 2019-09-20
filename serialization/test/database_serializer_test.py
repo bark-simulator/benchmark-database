@@ -12,9 +12,9 @@ from serialization.database_serializer import DatabaseSerializer
 class DatabaseSerializerTests(unittest.TestCase):
     def test_highway_merging(self):
         # last params must be only passed for testing purposes not for release!
-        dbs = DatabaseSerializer(test_scenarios=1, test_world_steps=10, serialize_scenarios=1)
+        dbs = DatabaseSerializer(test_scenarios=1, test_world_steps=10, num_serialize_scenarios=1)
         dbs.process("database")
-        dbs.release()
+        dbs.release(version="0.0.1")
 
 
 if __name__ == '__main__':
