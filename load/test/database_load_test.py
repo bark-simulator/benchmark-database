@@ -24,7 +24,7 @@ class DatabaseSerializerTests(unittest.TestCase):
         scenario_generation = db.get_scenario_generator(scenario_set_id=0)
 
     def test_database_from_github_release(self):
-        db = BenchmarkDatabase(database_root="database")
+        db = BenchmarkDatabase(database_root="external/benchmark_database_release")
         scenario_generation = db.get_scenario_generator(scenario_set_id=0)
 
 if __name__ == '__main__':

@@ -6,7 +6,8 @@ def benchmark_database_dependencies():
     _maybe(
     native.local_repository,
     name = "bark_project",
-    path="/home/bernhard/development/bark",)
+    path="/home/bernhard/development/bark",
+    )
 
     _maybe(
     http_archive,
