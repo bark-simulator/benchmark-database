@@ -7,6 +7,9 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("//util:deps.bzl", "benchmark_database_dependencies")
 benchmark_database_dependencies()
 
+load("//load:load.bzl", "benchmark_database_release")
+benchmark_database_release()
+
 http_archive(
     name = "gtest",
     url = "https://github.com/google/googletest/archive/release-1.7.0.zip",
