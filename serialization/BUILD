@@ -1,7 +1,6 @@
 py_library(
   name = "scenario_set_serializer",
   srcs = ["scenario_set_serializer.py"],
-  data = ['@bark_project//python:bark.so'],
   imports = ['../python/'],
   deps = ["@bark_project//modules/runtime/commons:parameters",
           "@bark_project//modules/runtime/commons:xodr_parser",
@@ -13,8 +12,7 @@ py_library(
 py_library(
   name = "database_serializer",
   srcs = ["database_serializer.py"],
-  data = ['@bark_project//python:bark.so',
-          "@ghr//:ghr_binary"],
+  data = ["@ghr//:ghr_binary"],
   imports = ['../python/'],
   deps = ["@bark_project//modules/runtime/commons:parameters",
           ":scenario_set_serializer"],
