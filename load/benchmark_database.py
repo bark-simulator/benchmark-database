@@ -50,10 +50,13 @@ class BenchmarkDatabase:
         scenario_generation = ScenarioGeneration()
 
         serialized_file_name = self.dataframe.iloc[scenario_set_id]["Serialized"]
-        if os.path.exists(serialized_file_name):
-            serialized_file_path = serialized_file_name
-        else:
-            serialized_file_path = os.path.join(self.database_root, serialized_file_name)
-
-        scenario_generation.load_scenario_list(filename=serialized_file_path)
+        #if os.path.exists(serialized_file_name):
+        #    serialized_file_path = serialized_file_name
+        #else:
+        #    serialized_file_path = os.path.join(self.database_root, serialized_file_name)
+        current_working_directory = os.getcwd()
+        os.chdir(self.database_root)
+        print(os.getcwd())
+        scenario_generation.load_scenario_list(filename=serialized_file_name)
+        os.chdir(current_working_directory)
         return scenario_generation
