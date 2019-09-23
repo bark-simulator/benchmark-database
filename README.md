@@ -1,4 +1,7 @@
 # Bark Benchmark-Database
+
+<img src="./doc/bark_benchmark_database.png" width="65%" align="center" />
+
 The benchmark database provides standardized scenarios and maps in
 a reprodudible form to ensure that each benchmark is based on the exact same conditions.
 
@@ -42,8 +45,28 @@ and pass your own [github token](https://help.github.com/en/articles/creating-a-
 and optinally the `--delete` argument if you want to overwrite an existing release tag.
 
 ## How to load the database?
+The database can either be loaded from github. To see how dependencies must be set up look into bark example `examples/scenarios_from_database.py`.
 
+To load the database from a local release simply pass the filename to the zipfile
+```
+db = BenchmarkDatabase(database_root=local_release_filename)
+```
+To get a scenario generator for a specific scenario set, look into the database
+ to find the corresponding scenario set id and pass it to `get_scenario_generator`
+```
+scenario_generation, scenario_set_name = db.get_scenario_generator(scenario_set_id=0)
+```
+
+You can also loop over the whole database with
+```
+for scenario_generator, scenario_set_name in self.benchmark_database:
+        process...
+```
 
 
 ## How to add your own scenarios?
 The creation of scenario sets relies on the ScenarioGeneration base class defined in `modules/runtime/scenario/scenario_generation`.
+Derive your own scenario generation class and put the created parameter file into the scenario_set direcotry - 
+a new subfolder.
+
+
