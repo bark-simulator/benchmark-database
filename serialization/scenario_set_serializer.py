@@ -38,8 +38,12 @@ class ScenarioSetSerializer:
         return "{}_scenarios{}_seed{}.{}".format(set_name, num_scenarios, seed, FILE_EXTENSION_SCENARIO_SET)
 
     @staticmethod
-    def scenario_set_info_filename():
-        return "scenario_set_info"
+    def scenario_set_info_filename(set_name):
+        return "set_info_{}".format(set_name)
+
+    @staticmethod
+    def scenario_set_info_fileprefix():
+        return "set_info"
 
     def dump(self, dir):
         self._dump(dir, self._scenario_generator_name, self._num_scenarios, self._generator_seed)
@@ -57,11 +61,11 @@ class ScenarioSetSerializer:
         self._scenario_generator.dump_scenario_list(filename)
         self._last_serialized_filename = filename
 
-        info_dict = {"GeneratorName": generator, "NumScenarios": num_scenarios,
+        info_dict = {"GeneratorName": generator, "SetName": self._set_name, "NumScenarios": num_scenarios,
                      "Seed": seed, "Serialized": filename, "Params": self._params.param_filename,
                      **kwargs}
 
-        info_filename = os.path.join(dir, ScenarioSetSerializer.scenario_set_info_filename())
+        info_filename = os.path.join(dir, ScenarioSetSerializer.scenario_set_info_filename(self._set_name))
         with open(info_filename, "wb") as f:
             pickle.dump(info_dict , f)
 

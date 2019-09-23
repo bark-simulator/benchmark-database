@@ -12,6 +12,7 @@ import pickle
 import zipfile
 
 from modules.runtime.scenario.scenario_generation.scenario_generation import ScenarioGeneration
+from modules.runtime.commons.parameters import ParameterServer
 from serialization.scenario_set_serializer import ScenarioSetSerializer
 
 FILE_EXTENSION_SCENARIO_SET = "bark_scenarios"
@@ -38,7 +39,7 @@ class BenchmarkDatabase:
         self.dataframe = pd.DataFrame()
         for root, dirs, files in os.walk(self.database_root):
             for file in files:
-                if file == ScenarioSetSerializer.scenario_set_info_filename():
+                if ScenarioSetSerializer.scenario_set_info_fileprefix() in file:
                     logging.info("Found info dict {}".format(file))
                     with open(os.path.join(root,file), "rb") as f:
                         info_dict = pickle.load(f)
@@ -46,17 +47,36 @@ class BenchmarkDatabase:
         logging.info("The following scenario sets are available")
         logging.info("\n"+self.dataframe.to_string()) 
 
-    def get_scenario_generator(self, scenario_set_id):
-        scenario_generation = ScenarioGeneration()
+    def get_num_scenario_sets(self):
+        return len(self.dataframe.index)
 
+    def get_scenario_generator(self, scenario_set_id):
         serialized_file_name = self.dataframe.iloc[scenario_set_id]["Serialized"]
         if os.path.exists(serialized_file_name):
             serialized_file_path = serialized_file_name
         else:
             serialized_file_path = os.path.join(self.database_root, serialized_file_name)
-        current_working_directory = os.getcwd()
-        os.chdir(self.database_root)
-        print(os.getcwd())
+        if os.path.exists(self.database_root):
+            # move into database root that map files can be found
+            os.chdir(self.database_root)
+        param_file_name = self.dataframe.iloc[scenario_set_id]["Params"]
+        params=ParameterServer(filename=param_file_name)
+        scenario_generation = ScenarioGeneration(params=params)
         scenario_generation.load_scenario_list(filename=serialized_file_name)
-        #os.chdir(current_working_directory)
-        return scenario_generation
+        scenario_set_name = self.dataframe.iloc[scenario_set_id]["SetName"]
+        return scenario_generation, scenario_set_name
+
+
+    def __iter__(self):
+        self.current_iter_idx=0
+        # An iterator interface to loop over all contained scenario sets
+        return self
+
+    def __next__(self):
+        if self.current_iter_idx < self.get_num_scenario_sets():
+            scenario_generator = self.get_scenario_generator(self.current_iter_idx)
+            self.current_iter_idx += 1
+            return scenario_generator
+        else:
+            raise StopIteration
+

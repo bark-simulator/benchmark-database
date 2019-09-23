@@ -10,7 +10,7 @@ from modules.runtime.commons.parameters import ParameterServer
 
 class ScenarioSetSerializerTests(unittest.TestCase):
     def test_highway_merging(self):
-        scenario_param_file =os.path.join("database","scenario_sets", "highway_merging", "ego_alone_on_right.json")
+        scenario_param_file =os.path.join("database","scenario_sets", "highway_merging", "velocity_2_8.json")
         param_server = ParameterServer(filename = scenario_param_file)
         param_server["Scenario"]["Generation"]["NumScenarios"] = 1 # set this down to reduce test runtime
         scenario_set_serializer = ScenarioSetSerializer(params=param_server)

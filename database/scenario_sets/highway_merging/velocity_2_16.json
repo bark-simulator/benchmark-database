@@ -54,9 +54,9 @@
         "Generation": {
             "GeneratorName": "UniformVehicleDistribution",
             "GeneratorSeed": 1000,
-            "SetName": "ego_alone_on_right",
+            "SetName": "velocity_2_16",
             "SetDescription": "Ego vehicle is the only vehicle on the right lane. Must merge to left lane where it is crowded with IDM vehicles",
-            "NumScenarios": 1,
+            "NumScenarios": 100,
             "NumSets": 1,
             "UniformVehicleDistribution": {
                 "MapFilename": "database/maps/city_highway_straight.xodr",
@@ -105,7 +105,7 @@
                 ],
                 "EgoVehicleVelocityRange": [
                     10,
-                    12
+                    16
                 ],
                 "VehicleModel": {
                     "behavior_model": "BehaviorIDMClassic",
