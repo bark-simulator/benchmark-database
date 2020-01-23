@@ -5,7 +5,7 @@ def benchmark_database_release():
     _maybe(
     http_archive,
     name = "benchmark_database_release",
-    urls = ["https://github.com/bark-simulator/benchmark-database/releases/download/v1.0.0/benchmark_database_2.0.zip"],
+    urls = ["https://github.com/bark-simulator/benchmark-database/releases/download/2.0/benchmark_database_2.0.zip"],
     build_file_content = """
 filegroup(
     name = "v2.0",
