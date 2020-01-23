@@ -120,7 +120,7 @@ cc_library(
     name = "python-lib",
     srcs = glob(["lib/libpython3.*", "libs/python3.lib", "libs/python36.lib"]),
     hdrs = glob(["include/**/*.h", "include/*.h"]),
-    includes = ["include/python3.6m", "include", "include/python3.7m", "include/python3.5m"], 
+    includes = ["include/python3.6m", "include", "include/python3.7m", "include/python3.5m"],
     visibility = ["//visibility:public"],
 )
     """

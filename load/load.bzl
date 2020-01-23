@@ -5,10 +5,10 @@ def benchmark_database_release():
     _maybe(
     http_archive,
     name = "benchmark_database_release",
-    urls = ["https://github.com/bark-simulator/benchmark-database/releases/download/v1.0.0/benchmark_database_v1.0.0.zip"],
+    urls = ["https://github.com/bark-simulator/benchmark-database/releases/download/v1.0.0/benchmark_database_2.0.zip"],
     build_file_content = """
 filegroup(
-    name = "v1.0.0",
+    name = "v2.0",
     srcs = glob(["**/**"]),
     visibility = ["//visibility:public"],
 )

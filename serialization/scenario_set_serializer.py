@@ -51,8 +51,8 @@ class ScenarioSetSerializer:
     def _dump(self, dir, generator, num_scenarios, seed, **kwargs):
         self._scenario_generator = eval("{}( \
                 num_scenarios={}, random_seed={}, params=self._params)".format(self._scenario_generator_name,
-                                                                     self._num_scenarios,
-                                                                     self._generator_seed))
+                                                                    self._num_scenarios,
+                                                                    self._generator_seed))
         filename = os.path.join(dir, ScenarioSetSerializer.scenario_file_name(
             self._set_name, self._num_scenarios, self._generator_seed
         ))
