@@ -20,90 +20,89 @@ FILE_EXTENSION_SCENARIO_SET = "bark_scenarios"
 
 
 class DatabaseSerializer:
-    def __init__(self, test_scenarios, test_world_steps, num_serialize_scenarios=None):
-        self._test_scenarios = test_scenarios
-        self._test_world_steps = test_world_steps
-        self._database_dir = None
+  def __init__(self, test_scenarios, test_world_steps, num_serialize_scenarios=None):
+    self._test_scenarios = test_scenarios
+    self._test_world_steps = test_world_steps
+    self._database_dir = None
 
-        # provides a way to reduce the generated scenarios for each param file for unittesting
-        self._num_serialize_scenarios = num_serialize_scenarios 
+    # provides a way to reduce the generated scenarios for each param file for unittesting
+    self._num_serialize_scenarios = num_serialize_scenarios 
 
-    def _process_folder(self, dir):
-        for root, dirs, files in os.walk(dir):
-            for name in files:
-                if name.endswith(".json"):
-                    self._process_json_paramfile(os.path.join(root, name))
-            for dir in dirs:
-                self._process_folder(dir)
+  def _process_folder(self, dir):
+    for root, dirs, files in os.walk(dir):
+      for name in files:
+        if name.endswith(".json"):
+          self._process_json_paramfile(os.path.join(root, name))
+      for dir in dirs:
+        self._process_folder(dir)
 
-    def _process_json_paramfile(self, param_filename):
-        param_server = ParameterServer(filename = param_filename)
-        if self._num_serialize_scenarios:
-            # set this down to reduce test runtime !Only for Unittesting!
-            param_server["Scenario"]["Generation"]["NumScenarios"] = self._num_serialize_scenarios 
+  def _process_json_paramfile(self, param_filename):
+    param_server = ParameterServer(filename = param_filename)
+    if self._num_serialize_scenarios:
+      # set this down to reduce test runtime !Only for Unittesting!
+      param_server["Scenario"]["Generation"]["NumScenarios"] = self._num_serialize_scenarios 
 
-        scenario_set_serializer = ScenarioSetSerializer(params=param_server)
-        scenario_set_serializer.dump(os.path.dirname(param_filename))
-        scenario_set_serializer.load()
-        scenario_set_serializer.test(num_scenarios=self._test_scenarios,
-                                     num_steps=self._test_world_steps)
-    
-    def process(self, database_dir):
-        self._database_dir = database_dir
-        self._process_folder(database_dir)
+    scenario_set_serializer = ScenarioSetSerializer(params=param_server)
+    scenario_set_serializer.dump(os.path.dirname(param_filename))
+    scenario_set_serializer.load()
+    scenario_set_serializer.test(num_scenarios=self._test_scenarios,
+                                  num_steps=self._test_world_steps)
+  
+  def process(self, database_dir):
+    self._database_dir = database_dir
+    self._process_folder(database_dir)
 
-    @staticmethod
-    def _release_file_name(version):
-        return "benchmark_database_{}".format(version)
+  @staticmethod
+  def _release_file_name(version):
+    return "benchmark_database_{}".format(version)
 
-    @staticmethod
-    def _pack(database_dir, packed_file_name):
-        logging.info('The following list of files will be released:')
-        zipf = zipfile.ZipFile(packed_file_name, 'w', zipfile.ZIP_DEFLATED)
-        tmp_dir = "/tmp/database/"  
-        if os.path.exists(tmp_dir):
-            shutil.rmtree(tmp_dir)
-        shutil.copytree(database_dir, tmp_dir) # copy to resolve symlinks
-        for root, dirs, files in os.walk(tmp_dir):
-            for file in files:
-                if file.endswith(".zip"):
-                    continue # do not include our own created zip file
-                zip_root = root.replace("/tmp/","")
-                logging.info(os.path.join(zip_root, file))
-                zipf.write(os.path.join(zip_root, file))
-        logging.info("Packed release file {}".format(os.path.abspath(packed_file_name)))
+  @staticmethod
+  def _pack(database_dir, packed_file_name):
+    logging.info('The following list of files will be released:')
+    zipf = zipfile.ZipFile(packed_file_name, 'w', zipfile.ZIP_DEFLATED)
+    tmp_dir = "/tmp/database/"  
+    if os.path.exists(tmp_dir):
+      shutil.rmtree(tmp_dir)
+    shutil.copytree(database_dir, tmp_dir) # copy to resolve symlinks
+    for root, dirs, files in os.walk(tmp_dir):
+      for file in files:
+          if file.endswith(".zip"):
+            continue # do not include our own created zip file
+          zip_root = root.replace("/tmp/","")
+          logging.info(os.path.join(zip_root, file))
+          zipf.write(os.path.join(zip_root, file))
+    logging.info("Packed release file {}".format(os.path.abspath(packed_file_name)))
 
-    @staticmethod
-    def _github_release(database_file, version, github_token, delete):
-        if delete:
-            delete_cmd = "-delete"
-        else:
-            delete_cmd = ""
-        print(os.getcwd())
-        ghr_command = os.path.abspath("external/ghr")
-        full_file_path = os.path.abspath(database_file)
-        os.chdir(ghr_command)
-        ghr_full_command = "./ghr -t {} -u bark-simulator -r benchmark-database {} {} {}".format(
-           github_token, delete_cmd, version, full_file_path)
-        out = subprocess.call(ghr_full_command, shell=True)
-        logging.info("Release output {}".format(out))
+  @staticmethod
+  def _github_release(database_file, version, github_token, delete):
+    if delete:
+      delete_cmd = "-delete"
+    else:
+      delete_cmd = ""
+    print(os.getcwd())
+    ghr_command = os.path.abspath("external/ghr")
+    full_file_path = os.path.abspath(database_file)
+    os.chdir(ghr_command)
+    ghr_full_command = "./ghr -t {} -u bark-simulator -r benchmark-database {} {} {}".format(
+      github_token, delete_cmd, version, full_file_path)
+    out = subprocess.call(ghr_full_command, shell=True)
+    logging.info("Release output {}".format(out))
 
-    def release(self, version, github_token=None, delete=False):
-        if self._num_serialize_scenarios:
-            logging.warning("Do not set down the number of serialized scenarios in a release \
-                    -> set serialized_scenarios=None")
+  def release(self, version, github_token=None, delete=False):
+    if self._num_serialize_scenarios:
+      logging.warning("Do not set down the number of serialized scenarios in a release \
+                -> set serialized_scenarios=None")
 
-        if not self._database_dir:
-            logging.error("No database dir given, call process first.")
+    if not self._database_dir:
+      logging.error("No database dir given, call process first.")
 
-        packed_file_name = os.path.join(self._database_dir,"{}.{}".format(
-            DatabaseSerializer._release_file_name(version), "zip"))
-        DatabaseSerializer._pack(self._database_dir, packed_file_name)
+    packed_file_name = os.path.join(self._database_dir,"{}.{}".format(
+      DatabaseSerializer._release_file_name(version), "zip"))
+    DatabaseSerializer._pack(self._database_dir, packed_file_name)
 
-        if github_token:
-            DatabaseSerializer._github_release(packed_file_name, version, github_token, delete)
-        else:
-            logging.info("Assuming local release as you did not provide a github token.")
-
-        return packed_file_name
+    if github_token:
+      DatabaseSerializer._github_release(packed_file_name, version, github_token, delete)
+    else:
+      logging.info("Assuming local release as you did not provide a github token.")
+    return packed_file_name
 

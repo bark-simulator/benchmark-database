@@ -5,7 +5,8 @@ def benchmark_database_dependencies():
     _maybe(
     git_repository,
     name = "bark_project",
-    commit="846c3a736a2606a7aeb067a55b25b9e354bd25bf",
+    # commit="846c3a736a2606a7aeb067a55b25b9e354bd25bf",
+    branch = "master",
     remote = "https://github.com/bark-simulator/bark",
     )
 
