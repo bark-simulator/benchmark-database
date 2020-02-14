@@ -12,7 +12,11 @@ import pickle
 from modules.runtime.scenario.scenario_generation.scenario_generation import ScenarioGeneration
 from modules.runtime.scenario.scenario_generation.uniform_vehicle_distribution import UniformVehicleDistribution
 from modules.runtime.scenario.scenario_generation.deterministic import DeterministicScenarioGeneration
+from modules.runtime.scenario.scenario_generation.configurable_scenario_generation import ConfigurableScenarioGeneration
 from modules.runtime.commons.parameters import ParameterServer
+from modules.runtime.viewer.matplotlib_viewer import MPViewer
+
+
 import modules.runtime.scenario.scenario_generation 
 
 FILE_EXTENSION_SCENARIO_SET = "bark_scenarios"
@@ -50,7 +54,7 @@ class ScenarioSetSerializer:
 
     def _dump(self, dir, generator, num_scenarios, seed, **kwargs):
         self._scenario_generator = eval("{}( \
-                num_scenarios={}, random_seed={}, params=self._params)".format(self._scenario_generator_name,
+                num_scenarios={}, params=self._params, random_seed={})".format(self._scenario_generator_name,
                                                                     self._num_scenarios,
                                                                     self._generator_seed))
         filename = os.path.join(dir, ScenarioSetSerializer.scenario_file_name(
@@ -75,7 +79,7 @@ class ScenarioSetSerializer:
         self._scenario_generator = ScenarioGeneration()
         self._scenario_generator.load_scenario_list(filename=filename)
 
-    def test(self, num_scenarios, num_steps):
+    def test(self, num_scenarios, num_steps, visualize_test):
         if not self._scenario_generator:
             logging.error("No scenario generator initialized for testing")
             return
@@ -83,14 +87,55 @@ class ScenarioSetSerializer:
         logging.info("Testing {} with seed {} from generator {}".format(
             self._set_name, self._generator_seed, self._scenario_generator_name
         ))
+
+        results = []
         for _ in range(0, num_scenarios ): # run all scenarios
             scenario_idx = random.randint(0, self._num_scenarios-1)
             scenario = self._scenario_generator.get_scenario(scenario_idx)
-            world_state = scenario.get_world_state()
+            result = self._test_scenario(scenario, num_steps, visualize_test)
+            results.append(result)
+
+        failed = not all(results)
+        failed_scenario_idx = [idx for idx, rst in enumerate(results) if rst == False]
+        if failed:
+            logging.error("Failed scenario indexes {} during testing of {} with seed {} and generator {}".format(
+            failed_scenario_idx, self._set_name, self._generator_seed, self._scenario_generator_name))
+            return False
+        return True
+
+
+    def _test_scenario(scenario, num_steps, visualize):
             logging.info("Running scenario {} of {} in set {}".format(scenario_idx,
-                                                                 self._scenario_generator.num_scenarios,
-                                                                 self._set_name))
-            for _ in range(0, num_steps): # run a few steps for each scenario
-                world_state.step(self._simulation_step_time)
+                                                                self._scenario_generator.num_scenarios,
+                                                                self._set_name))
+            try:
+                world_state = scenario.get_world_state()
+            except:
+                logging.error("Deserialization failed.")
+                return False
+
+            if visualize_test:
+                viewer = MPViewer(
+                params=param_server,
+                x_range=[5060, 5160],
+                y_range=[5070,5150],
+                use_world_bounds=True)
+                sim_step_time = param_server["simulation"]["step_time",
+                                                        "Step-time used in simulation",
+                                                        0.2]
+                sim_real_time_factor = param_server["simulation"]["real_time_factor",
+                                                                "execution in real-time or faster",
+                                                                1]
+
+            try:
+                for _ in range(0, num_steps): # run a few steps for each scenario
+                    world_state.step(self._simulation_step_time)
+                    if visualize_test:
+                        viewer.drawWorld(world_state, scenario._eval_agent_ids)
+                        viewer.show(block=False)
+                        time.sleep(sim_step_time/sim_real_time_factor)
+            except:
+                logging.error("Simulation failed.")
+                return False
 
 

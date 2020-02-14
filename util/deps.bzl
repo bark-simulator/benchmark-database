@@ -3,9 +3,24 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def benchmark_database_dependencies():
     _maybe(
+    native.new_local_repository,
+    name = "python_linux",
+    path = "./util/venv/",
+    build_file_content = """
+cc_library(
+    name = "python-lib",
+    srcs = glob(["lib/libpython3.*", "libs/python3.lib", "libs/python36.lib"]),
+    hdrs = glob(["include/**/*.h", "include/*.h"]),
+    includes = ["include/python3.6m", "include", "include/python3.7m", "include/python3.5m"],
+    visibility = ["//visibility:public"],
+)
+        """
+    )
+
+    _maybe(
     git_repository,
     name = "bark_project",
-    commit="846c3a736a2606a7aeb067a55b25b9e354bd25bf",
+    commit="96b898513a102aabd07623bec232644d22566f04",
     remote = "https://github.com/bark-simulator/bark",
     )
 

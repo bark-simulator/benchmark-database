@@ -20,9 +20,10 @@ FILE_EXTENSION_SCENARIO_SET = "bark_scenarios"
 
 
 class DatabaseSerializer:
-    def __init__(self, test_scenarios, test_world_steps, num_serialize_scenarios=None):
+    def __init__(self, test_scenarios, test_world_steps, num_serialize_scenarios=None, visualize_tests=False):
         self._test_scenarios = test_scenarios
         self._test_world_steps = test_world_steps
+        self._visualize_test = visualize_tests
         self._database_dir = None
 
         # provides a way to reduce the generated scenarios for each param file for unittesting
@@ -46,7 +47,8 @@ class DatabaseSerializer:
         scenario_set_serializer.dump(os.path.dirname(param_filename))
         scenario_set_serializer.load()
         scenario_set_serializer.test(num_scenarios=self._test_scenarios,
-                                     num_steps=self._test_world_steps)
+                                     num_steps=self._test_world_steps,
+                                     visualize_test=self._visualize_test)
     
     def process(self, database_dir):
         self._database_dir = database_dir

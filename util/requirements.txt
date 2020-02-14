@@ -1,0 +1,4 @@
+matplotlib==3.0.3
+numpy==1.18.1
+pandas==0.24.2
+aabbtree==2.3.1
