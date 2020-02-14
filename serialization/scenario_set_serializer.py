@@ -79,7 +79,7 @@ class ScenarioSetSerializer:
         self._scenario_generator = ScenarioGeneration()
         self._scenario_generator.load_scenario_list(filename=filename)
 
-    def test(self, num_scenarios, num_steps, visualize_test):
+    def test(self, num_scenarios, num_steps, visualize_test, viewer=None):
         if not self._scenario_generator:
             logging.error("No scenario generator initialized for testing")
             return
@@ -91,7 +91,7 @@ class ScenarioSetSerializer:
         results = []
         for _ in range(0, num_scenarios ): # run all scenarios
             scenario_idx = random.randint(0, self._num_scenarios-1)
-            result = self._test_scenario(scenario_idx, num_steps, visualize_test)
+            result = self._test_scenario(scenario_idx, num_steps, visualize_test, viewer)
             results.append(result)
 
         failed = not all(results)
@@ -103,7 +103,7 @@ class ScenarioSetSerializer:
         return True
 
 
-    def _test_scenario(self, scenario_idx, num_steps, visualize):
+    def _test_scenario(self, scenario_idx, num_steps, visualize, viewer):
             logging.info("Running scenario {} of {} in set {}".format(scenario_idx,
                                                                 self._scenario_generator.num_scenarios,
                                                                 self._set_name))
@@ -119,11 +119,12 @@ class ScenarioSetSerializer:
                 return False
 
             if visualize:
-                viewer = MPViewer(
-                params=ParameterServer(),
-                x_range=[5060, 5160],
-                y_range=[5070,5150],
-                use_world_bounds=True)
+                if not viewer:
+                  viewer = MPViewer(
+                  params=ParameterServer(),
+                  x_range=[5060, 5160],
+                  y_range=[5070,5150],
+                  use_world_bounds=True)
 
             sim_step_time = 0.2
             sim_real_time_factor = 1
