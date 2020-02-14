@@ -132,7 +132,7 @@ class ScenarioSetSerializer:
             try:
                 for _ in range(0, num_steps): # run a few steps for each scenario
                   if visualize:
-                        viewer.drawWorld(world_state, scenario._eval_agent_ids)
+                        viewer.drawWorld(world_state, scenario._eval_agent_ids, scenario_idx)
                         viewer.show(block=False)
                         time.sleep(sim_step_time/sim_real_time_factor)
                   world_state.Step(sim_step_time)
