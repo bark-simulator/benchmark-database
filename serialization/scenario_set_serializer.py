@@ -66,8 +66,7 @@ class ScenarioSetSerializer:
         self._last_serialized_filename = filename
 
         info_dict = {"GeneratorName": generator, "SetName": self._set_name, "NumScenarios": num_scenarios,
-                     "Seed": seed, "Serialized": filename, "Params": self._params.param_filename,
-                     **kwargs}
+                     "Seed": seed, "Serialized": filename, "Params": self._params.param_filename, **kwargs}
 
         info_filename = os.path.join(dir, ScenarioSetSerializer.scenario_set_info_filename(self._set_name))
         with open(info_filename, "wb") as f:
@@ -91,8 +90,7 @@ class ScenarioSetSerializer:
         results = []
         for _ in range(0, num_scenarios ): # run all scenarios
             scenario_idx = random.randint(0, self._num_scenarios-1)
-            scenario = self._scenario_generator.get_scenario(scenario_idx)
-            result = self._test_scenario(scenario, num_steps, visualize_test)
+            result = self._test_scenario(scenario_idx, num_steps, visualize_test)
             results.append(result)
 
         failed = not all(results)
@@ -104,33 +102,36 @@ class ScenarioSetSerializer:
         return True
 
 
-    def _test_scenario(scenario, num_steps, visualize):
+    def _test_scenario(self, scenario_idx, num_steps, visualize):
             logging.info("Running scenario {} of {} in set {}".format(scenario_idx,
                                                                 self._scenario_generator.num_scenarios,
                                                                 self._set_name))
             try:
-                world_state = scenario.get_world_state()
+                scenario = self._scenario_generator.get_scenario(scenario_idx)
             except:
                 logging.error("Deserialization failed.")
                 return False
+            try:
+                world_state = scenario.get_world_state()
+            except:
+                logging.error("Get world state failed.")
+                return False
 
-            if visualize_test:
+            if visualize:
                 viewer = MPViewer(
-                params=param_server,
+                params=ParameterServer(),
                 x_range=[5060, 5160],
                 y_range=[5070,5150],
                 use_world_bounds=True)
-                sim_step_time = param_server["simulation"]["step_time",
-                                                        "Step-time used in simulation",
-                                                        0.2]
-                sim_real_time_factor = param_server["simulation"]["real_time_factor",
-                                                                "execution in real-time or faster",
-                                                                1]
+
+                # todo(@bernhard) make scenario parameter dependent
+                sim_step_time = 0.2
+                sim_real_time_factor = 1
 
             try:
                 for _ in range(0, num_steps): # run a few steps for each scenario
                     world_state.step(self._simulation_step_time)
-                    if visualize_test:
+                    if visualize:
                         viewer.drawWorld(world_state, scenario._eval_agent_ids)
                         viewer.show(block=False)
                         time.sleep(sim_step_time/sim_real_time_factor)
