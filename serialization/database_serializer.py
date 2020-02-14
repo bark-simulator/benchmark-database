@@ -33,7 +33,7 @@ class DatabaseSerializer:
         for root, dirs, files in os.walk(dir):
             for name in files:
                 if name.endswith(".json"):
-                    self._process_json_paramfile(os.path.join(root, name))
+                    return self._process_json_paramfile(os.path.join(root, name))
             for dir in dirs:
                 self._process_folder(dir)
 
@@ -46,13 +46,13 @@ class DatabaseSerializer:
         scenario_set_serializer = ScenarioSetSerializer(params=param_server)
         scenario_set_serializer.dump(os.path.dirname(param_filename))
         scenario_set_serializer.load()
-        scenario_set_serializer.test(num_scenarios=self._test_scenarios,
+        return scenario_set_serializer.test(num_scenarios=self._test_scenarios,
                                      num_steps=self._test_world_steps,
                                      visualize_test=self._visualize_test)
     
     def process(self, database_dir):
         self._database_dir = database_dir
-        self._process_folder(database_dir)
+        return self._process_folder(database_dir)
 
     @staticmethod
     def _release_file_name(version):

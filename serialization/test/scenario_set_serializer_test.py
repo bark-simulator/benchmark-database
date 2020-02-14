@@ -17,8 +17,9 @@ class ScenarioSetSerializerTests(unittest.TestCase):
 
         scenario_set_serializer.dump(os.path.join("database", "scenario_sets", "highway_merging"))
         scenario_set_serializer.load()
-        scenario_set_serializer.test(num_scenarios=1, num_steps=5, visualize_test=False)
-
-        scenario_set_serializer.test(num_scenarios=1, num_steps=5, visualize_test=True)
+        test_result = scenario_set_serializer.test(num_scenarios=1, num_steps=5, visualize_test=False)
+        self.assertTrue(test_result)
+        test_result = scenario_set_serializer.test(num_scenarios=1, num_steps=5, visualize_test=True)
+        self.assertTrue(test_result)
 if __name__ == '__main__':
     unittest.main()

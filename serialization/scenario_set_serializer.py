@@ -7,6 +7,7 @@ import os
 import logging
 import random
 import pickle
+import time
 
 
 from modules.runtime.scenario.scenario_generation.scenario_generation import ScenarioGeneration
@@ -108,13 +109,13 @@ class ScenarioSetSerializer:
                                                                 self._set_name))
             try:
                 scenario = self._scenario_generator.get_scenario(scenario_idx)
-            except:
-                logging.error("Deserialization failed.")
+            except Exception as e:
+                logging.error("Deserialization failed with {}.".format(e))
                 return False
             try:
                 world_state = scenario.get_world_state()
-            except:
-                logging.error("Get world state failed.")
+            except Exception as e:
+                logging.error("Get world state failed with {}.".format(e))
                 return False
 
             if visualize:
@@ -124,19 +125,19 @@ class ScenarioSetSerializer:
                 y_range=[5070,5150],
                 use_world_bounds=True)
 
-                # todo(@bernhard) make scenario parameter dependent
-                sim_step_time = 0.2
-                sim_real_time_factor = 1
+            sim_step_time = 0.2
+            sim_real_time_factor = 1
 
             try:
                 for _ in range(0, num_steps): # run a few steps for each scenario
-                    world_state.step(self._simulation_step_time)
-                    if visualize:
+                  if visualize:
                         viewer.drawWorld(world_state, scenario._eval_agent_ids)
                         viewer.show(block=False)
                         time.sleep(sim_step_time/sim_real_time_factor)
-            except:
-                logging.error("Simulation failed.")
+                  world_state.Step(sim_step_time)
+                return True
+            except Exception as e:
+                logging.error("Simulation failed with {}.".format(e))
                 return False
 
 
