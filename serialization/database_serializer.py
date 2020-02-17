@@ -31,12 +31,15 @@ class DatabaseSerializer:
         self._num_serialize_scenarios = num_serialize_scenarios 
 
     def _process_folder(self, dir):
+        process_result = True
         for root, dirs, files in os.walk(dir):
             for name in files:
                 if name.endswith(".json"):
-                    return self._process_json_paramfile(os.path.join(root, name))
+                    process_result = process_result and \
+                           self._process_json_paramfile(os.path.join(root, name))
             for dir in dirs:
                 self._process_folder(dir)
+        return process_result
 
     def _process_json_paramfile(self, param_filename):
         param_server = ParameterServer(filename = param_filename)

@@ -31,10 +31,9 @@ class ScenarioSetSerializer:
         self._params = params
         self._scenario_generator_name = self._params["Scenario"]["Generation"]["GeneratorName"]
         self._generator_seed =  self._params["Scenario"]["Generation"]["GeneratorSeed"]
-        self._num_sets =  self._params["Scenario"]["Generation"]["GeneratorName"]
         self._num_scenarios =  self._params["Scenario"]["Generation"]["NumScenarios"]
         self._set_name =   self._params["Scenario"]["Generation"]["SetName"]
-        self._simulation_step_time = self._params["simulation"]["step_time"]
+        self._simulation_step_time = self._params["Simulation"]["StepTime"]
         self._scenario_generator = None
         self._last_serialized_filename = None
     
