@@ -93,8 +93,8 @@ class BenchmarkDatabase:
         else:
             raise StopIteration
 
-    def apply_filter(self, **kwargs):
-        dataframe = self.dataframe[self.dataframe['SetName'].str.contains(**kwargs)]
+    def apply_filter(self, pattern, **kwargs):
+        dataframe = self.dataframe[self.dataframe['SetName'].str.contains(pat=pattern, **kwargs)]
         return BenchmarkDatabase(database_root=self.database_root,
                                 dataframe=dataframe)
 
