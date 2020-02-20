@@ -24,7 +24,7 @@ class DatabaseSerializerTests(unittest.TestCase):
         scenario_generation, _ = db.get_scenario_generator(scenario_set_id=0)
         self.assertEqual(db.get_num_scenario_sets(), 2)
 
-        db_filtered = db.apply_filter(pat="_1")
+        db_filtered = db.apply_filter("_1")
         self.assertEqual(db_filtered.get_num_scenario_sets(), 1)
 
         for scenario_generation, _ in db:
