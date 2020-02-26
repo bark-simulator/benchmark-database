@@ -41,8 +41,11 @@ class DatabaseSerializer:
                 self._process_folder(dir)
         return process_result
 
-    def _process_json_paramfile(self, param_filename):
-        param_server = ParameterServer(filename = param_filename)
+    def _process_json_paramfile(self, param_filename, json=None):
+        if json:
+            param_server = ParameterServer(json = json)
+        else:
+            param_server = ParameterServer(filename = param_filename)
         if self._num_serialize_scenarios:
             # set this down to reduce test runtime !Only for Unittesting!
             param_server["Scenario"]["Generation"]["NumScenarios"] = self._num_serialize_scenarios 
@@ -55,9 +58,31 @@ class DatabaseSerializer:
                                      visualize_test=self._visualize_tests,
                                      viewer=self._viewer)
     
-    def process(self, database_dir):
-        self._database_dir = database_dir
-        return self._process_folder(database_dir)
+    def _process_scenario_list(self, database_dir, scenario_set_dict):
+        serialized_sets_dir = os.path.join(database_dir, "scenario_sets")
+        if not os.path.exists(serialized_sets_dir):
+            os.makedirs(serialized_sets_dir)
+        process_result = True
+        for scenario_set, json_params in scenario_set_dict.items():
+            json_params["Scenario"]["Generation"]["SetName"] = scenario_set
+            params = ParameterServer(json=json_params)
+            filename = os.path.join(serialized_sets_dir, "{}.json".format(scenario_set))
+            print(filename)
+            params.save(filename)
+            process_result = process_result and \
+                    self._process_json_paramfile(filename, json=json_params)
+        return process_result
+
+    def process(self, database_dir, scenario_set_dict=None):
+        if not scenario_set_dict:
+            self._database_dir = database_dir
+            succ = self._process_folder(database_dir)
+        elif database_dir and scenario_set_dict:
+            self._database_dir = database_dir # TODO(@Klemens): use serialized_sets_dir?
+            succ = self._process_scenario_list(database_dir, scenario_set_dict)
+        else:
+            raise ValueError("Invalid argument combination.")
+        return succ
 
     @staticmethod
     def _release_file_name(version):

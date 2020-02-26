@@ -14,6 +14,8 @@ from modules.runtime.scenario.scenario_generation.scenario_generation import Sce
 from modules.runtime.scenario.scenario_generation.uniform_vehicle_distribution import UniformVehicleDistribution
 from modules.runtime.scenario.scenario_generation.deterministic import DeterministicScenarioGeneration
 from modules.runtime.scenario.scenario_generation.configurable_scenario_generation import ConfigurableScenarioGeneration
+from modules.runtime.scenario.scenario_generation.interaction_dataset_scenario_generation import InteractionDatasetScenarioGeneration
+
 from modules.runtime.commons.parameters import ParameterServer
 from modules.runtime.viewer.matplotlib_viewer import MPViewer
 
