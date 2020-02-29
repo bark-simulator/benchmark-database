@@ -22,6 +22,10 @@ class DatabaseSerializerTests(unittest.TestCase):
         # then reload to test correct parsing
         db = BenchmarkDatabase(database_root=local_release_filename)
         scenario_generation, _ = db.get_scenario_generator(scenario_set_id=0)
+        self.assertEqual(db.get_num_scenario_sets(), 2)
+
+        db_filtered = db.apply_filter("_1")
+        self.assertEqual(db_filtered.get_num_scenario_sets(), 1)
 
         for scenario_generation, _ in db:
             print(scenario_generation)

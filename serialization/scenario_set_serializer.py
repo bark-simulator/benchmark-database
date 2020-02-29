@@ -14,6 +14,8 @@ from modules.runtime.scenario.scenario_generation.scenario_generation import Sce
 from modules.runtime.scenario.scenario_generation.uniform_vehicle_distribution import UniformVehicleDistribution
 from modules.runtime.scenario.scenario_generation.deterministic import DeterministicScenarioGeneration
 from modules.runtime.scenario.scenario_generation.configurable_scenario_generation import ConfigurableScenarioGeneration
+from modules.runtime.scenario.scenario_generation.interaction_dataset_scenario_generation import InteractionDatasetScenarioGeneration
+
 from modules.runtime.commons.parameters import ParameterServer
 from modules.runtime.viewer.matplotlib_viewer import MPViewer
 
@@ -131,9 +133,10 @@ class ScenarioSetSerializer:
             try:
                 for _ in range(0, num_steps): # run a few steps for each scenario
                   if visualize:
-                        viewer.drawWorld(world_state, scenario._eval_agent_ids, scenario_idx)
+                        viewer.drawWorld(world_state, scenario._eval_agent_ids, scenario_idx=scenario_idx)
                         viewer.show(block=False)
                         time.sleep(sim_step_time/sim_real_time_factor)
+                        viewer.clear()
                   world_state.Step(sim_step_time)
                 return True
             except Exception as e:

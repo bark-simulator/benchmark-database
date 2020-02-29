@@ -22,7 +22,16 @@ FILE_EXTENSION_SCENARIO_SET = "bark_scenarios"
 
 
 class BenchmarkDatabase:
-    def __init__(self, database_root):
+    def __init__(self, database_root=None, dataframe=None):
+        if database_root and not isinstance(dataframe, pd.DataFrame):
+          self._init_from_database_root(database_root)
+        elif  isinstance(dataframe, pd.DataFrame) and database_root:
+          self._init_from_dataframe(dataframe, database_root)
+        else:
+          raise ValueError("Invalid argument combination \
+                        for initialization of database")
+    
+    def _init_from_database_root(self, database_root):
         self.database_root = database_root
         if not os.path.exists(database_root):
             logging.error("Given database root does not exist")
@@ -45,7 +54,11 @@ class BenchmarkDatabase:
                         info_dict = pickle.load(f)
                     self.dataframe = self.dataframe.append(info_dict, ignore_index=True)
         logging.info("The following scenario sets are available")
-        logging.info("\n"+self.dataframe.to_string()) 
+        logging.info("\n"+self.dataframe.to_string())
+    
+    def _init_from_dataframe(self, dataframe, database_root):
+        self.database_root = database_root
+        self.dataframe = dataframe
 
     def get_num_scenario_sets(self):
         return len(self.dataframe.index)
@@ -60,7 +73,12 @@ class BenchmarkDatabase:
             # move into database root that map files can be found
             os.chdir(self.database_root)
         param_file_name = self.dataframe.iloc[scenario_set_id]["Params"]
-        params=ParameterServer(filename=param_file_name)
+        if not param_file_name:
+            logging.warning("No param file found for scenario set {}. Using defaults...".format(
+                self.dataframe.iloc[scenario_set_id]["SetName"]))
+            params = ParameterServer()
+        else:
+            params=ParameterServer(filename=param_file_name)
         scenario_generation = ScenarioGeneration(params=params)
         scenario_generation.load_scenario_list(filename=serialized_file_name)
         scenario_set_name = self.dataframe.iloc[scenario_set_id]["SetName"]
@@ -79,4 +97,10 @@ class BenchmarkDatabase:
             return scenario_generator
         else:
             raise StopIteration
+
+    def apply_filter(self, pattern, **kwargs):
+        dataframe = self.dataframe[self.dataframe['SetName'].str.contains(pat=pattern, **kwargs)]
+        return BenchmarkDatabase(database_root=self.database_root,
+                                dataframe=dataframe)
+
 
