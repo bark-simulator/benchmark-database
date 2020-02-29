@@ -38,7 +38,7 @@ class DatabaseSerializer:
                     process_result = process_result and \
                            self._process_json_paramfile(os.path.join(root, name))
             for dir in dirs:
-                self._process_folder(dir)
+                process_result = process_result and self._process_folder(dir)
         return process_result
 
     def _process_json_paramfile(self, param_filename):
