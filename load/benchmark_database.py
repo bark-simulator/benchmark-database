@@ -73,7 +73,12 @@ class BenchmarkDatabase:
             # move into database root that map files can be found
             os.chdir(self.database_root)
         param_file_name = self.dataframe.iloc[scenario_set_id]["Params"]
-        params=ParameterServer(filename=param_file_name)
+        if not param_file_name:
+            logging.warning("No param file found for scenario set {}. Using defaults...".format(
+                self.dataframe.iloc[scenario_set_id]["SetName"]))
+            params = ParameterServer()
+        else:
+            params=ParameterServer(filename=param_file_name)
         scenario_generation = ScenarioGeneration(params=params)
         scenario_generation.load_scenario_list(filename=serialized_file_name)
         scenario_set_name = self.dataframe.iloc[scenario_set_id]["SetName"]
