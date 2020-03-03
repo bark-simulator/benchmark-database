@@ -5,6 +5,7 @@
 
 import unittest
 import os
+import matplotlib
 from serialization.scenario_set_serializer import ScenarioSetSerializer
 from modules.runtime.commons.parameters import ParameterServer
 
