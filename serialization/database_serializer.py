@@ -100,9 +100,9 @@ class DatabaseSerializer:
             for file in files:
                 if file.endswith(".zip"):
                     continue # do not include our own created zip file
-                zip_root = root.replace("/tmp/","")
+                zip_root = root.replace("/tmp/database", "")
                 logging.info(os.path.join(zip_root, file))
-                zipf.write(os.path.join(zip_root, file))
+                zipf.write(os.path.join(zip_root, file), os.path.join(zip_root, file))
         logging.info("Packed release file {}".format(os.path.abspath(packed_file_name)))
 
     @staticmethod
