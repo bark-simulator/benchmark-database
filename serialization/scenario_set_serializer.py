@@ -80,7 +80,7 @@ class ScenarioSetSerializer:
         self._scenario_generator = ScenarioGeneration()
         self._scenario_generator.load_scenario_list(filename=filename)
 
-    def test(self, num_scenarios, num_steps, visualize_test, viewer=None):
+    def test(self, num_scenarios, num_steps, visualize_test, viewer=None, test_scenario_idxs = None):
         if not self._scenario_generator:
             logging.error("No scenario generator initialized for testing")
             return
@@ -90,9 +90,9 @@ class ScenarioSetSerializer:
         ))
 
         results = []
-        if not isinstance(num_scenarios, list):
-            num_scenarios = random.sample(list(range(0, num_scenarios)), num_scenarios)
-        for scenario_idx in num_scenarios: # run all scenarios
+        if not test_scenario_idxs:
+            test_scenario_idxs = random.sample(list(range(0, num_scenarios)), num_scenarios)
+        for scenario_idx in test_scenario_idxs: # run all scenarios
             result = self._test_scenario(scenario_idx, num_steps, visualize_test, viewer)
             results.append(result)
 

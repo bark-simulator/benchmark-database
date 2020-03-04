@@ -20,9 +20,11 @@ FILE_EXTENSION_SCENARIO_SET = "bark_scenarios"
 
 
 class DatabaseSerializer:
-    def __init__(self, test_scenarios, test_world_steps, num_serialize_scenarios=None, visualize_tests=False, viewer=None):
+    def __init__(self, test_scenarios, test_world_steps, num_serialize_scenarios=None, test_scenario_idxs=None,
+                                                               visualize_tests=False, viewer=None):
         self._test_scenarios = test_scenarios
         self._test_world_steps = test_world_steps
+        self._test_scenario_idxs = test_scenario_idxs
         self._visualize_tests = visualize_tests
         self._database_dir = None
         self._viewer = viewer
@@ -56,7 +58,8 @@ class DatabaseSerializer:
         return scenario_set_serializer.test(num_scenarios=self._test_scenarios,
                                      num_steps=self._test_world_steps,
                                      visualize_test=self._visualize_tests,
-                                     viewer=self._viewer)
+                                     viewer=self._viewer,
+                                     test_scenario_idxs=self._test_scenario_idxs)
     
     def _process_scenario_list(self, database_dir, scenario_set_dict):
         serialized_sets_dir = os.path.join(database_dir, "scenario_sets")
