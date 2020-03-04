@@ -90,8 +90,9 @@ class ScenarioSetSerializer:
         ))
 
         results = []
-        for _ in range(0, num_scenarios ): # run all scenarios
-            scenario_idx = random.randint(0, self._num_scenarios-1)
+        if not isinstance(num_scenarios, list):
+            num_scenarios = random.sample(list(range(0, num_scenarios)), num_scenarios)
+        for scenario_idx in num_scenarios: # run all scenarios
             result = self._test_scenario(scenario_idx, num_steps, visualize_test, viewer)
             results.append(result)
 
