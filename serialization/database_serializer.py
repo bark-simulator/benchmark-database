@@ -51,11 +51,12 @@ class DatabaseSerializer:
             param_server["Scenario"]["Generation"]["NumScenarios"] = self._num_serialize_scenarios 
 
         scenario_set_serializer = ScenarioSetSerializer(params=param_server)
-        scenario_set_serializer.dump(os.path.dirname(param_filename))
+        scenario_set_serializer.dump(self._database_dir, os.path.relpath(os.path.dirname(param_filename), self._database_dir))
         scenario_set_serializer.load()
         return scenario_set_serializer.test(num_scenarios=self._test_scenarios,
                                      num_steps=self._test_world_steps,
                                      visualize_test=self._visualize_tests,
+                                     db_dir=self._database_dir,
                                      viewer=self._viewer)
     
     def _process_scenario_list(self, database_dir, scenario_set_dict):
@@ -100,9 +101,9 @@ class DatabaseSerializer:
             for file in files:
                 if file.endswith(".zip"):
                     continue # do not include our own created zip file
-                zip_root = root.replace("/tmp/database", "")
+                zip_root = root.replace("/tmp/database/", "")
                 logging.info(os.path.join(zip_root, file))
-                zipf.write(os.path.join(zip_root, file), os.path.join(zip_root, file))
+                zipf.write(os.path.join(root, file), os.path.join(zip_root, file))
         logging.info("Packed release file {}".format(os.path.abspath(packed_file_name)))
 
     @staticmethod

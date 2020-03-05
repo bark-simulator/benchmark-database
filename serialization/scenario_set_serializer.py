@@ -51,28 +51,29 @@ class ScenarioSetSerializer:
     def scenario_set_info_fileprefix():
         return "set_info"
 
-    def dump(self, dir):
-        self._dump(dir, self._scenario_generator_name, self._num_scenarios, self._generator_seed)
+    def dump(self, db_dir, sub_dir):
+        self._dump(db_dir, sub_dir, self._scenario_generator_name, self._num_scenarios, self._generator_seed)
 
-    def _dump(self, dir, generator, num_scenarios, seed, **kwargs):
+    def _dump(self, db_dir, sub_dir, generator, num_scenarios, seed, **kwargs):
         self._scenario_generator = eval("{}( \
                 num_scenarios={}, params=self._params, random_seed={})".format(self._scenario_generator_name,
                                                                     self._num_scenarios,
                                                                     self._generator_seed))
-        filename = os.path.join(dir, ScenarioSetSerializer.scenario_file_name(
+        filename = os.path.join(db_dir, sub_dir, ScenarioSetSerializer.scenario_file_name(
             self._set_name, self._num_scenarios, self._generator_seed
         ))
+        rel_filename = os.path.relpath(filename, db_dir)
         if not os.path.exists(os.path.dirname(filename)):
             os.makedirs(os.path.dirname(filename))
         self._scenario_generator.dump_scenario_list(filename)
         self._last_serialized_filename = filename
-
+        param_path = os.path.relpath(self._params.param_filename, db_dir)
         info_dict = {"GeneratorName": generator, "SetName": self._set_name, "NumScenarios": num_scenarios,
-                     "Seed": seed, "Serialized": filename, "Params": self._params.param_filename, **kwargs}
+                     "Seed": seed, "Serialized": rel_filename, "Params": param_path, **kwargs}
 
-        info_filename = os.path.join(dir, ScenarioSetSerializer.scenario_set_info_filename(self._set_name))
+        info_filename = os.path.join(db_dir, sub_dir, ScenarioSetSerializer.scenario_set_info_filename(self._set_name))
         with open(info_filename, "wb") as f:
-            pickle.dump(info_dict , f)
+            pickle.dump(info_dict, f)
 
     def load(self, filename=None):
         if not filename and self._last_serialized_filename:
@@ -80,7 +81,7 @@ class ScenarioSetSerializer:
         self._scenario_generator = ScenarioGeneration()
         self._scenario_generator.load_scenario_list(filename=filename)
 
-    def test(self, num_scenarios, num_steps, visualize_test, viewer=None):
+    def test(self, num_scenarios, num_steps, visualize_test, db_dir, viewer=None):
         if not self._scenario_generator:
             logging.error("No scenario generator initialized for testing")
             return
@@ -92,7 +93,7 @@ class ScenarioSetSerializer:
         results = []
         for _ in range(0, num_scenarios ): # run all scenarios
             scenario_idx = random.randint(0, self._num_scenarios-1)
-            result = self._test_scenario(scenario_idx, num_steps, visualize_test, viewer)
+            result = self._test_scenario(scenario_idx, num_steps, visualize_test, db_dir, viewer)
             results.append(result)
 
         failed = not all(results)
@@ -104,7 +105,7 @@ class ScenarioSetSerializer:
         return True
 
 
-    def _test_scenario(self, scenario_idx, num_steps, visualize, viewer):
+    def _test_scenario(self, scenario_idx, num_steps, visualize, db_dir, viewer):
             logging.info("Running scenario {} of {} in set {}".format(scenario_idx,
                                                                 self._scenario_generator.num_scenarios,
                                                                 self._set_name))
@@ -114,7 +115,11 @@ class ScenarioSetSerializer:
                 logging.error("Deserialization failed with {}.".format(e))
                 return False
             try:
+                # Change cwd for a moment to load map from correct directory
+                cwd = os.getcwd()
+                os.chdir(db_dir)
                 world_state = scenario.get_world_state()
+                os.chdir(cwd)
             except Exception as e:
                 logging.error("Get world state failed with {}.".format(e))
                 return False
