@@ -5,6 +5,7 @@
 
 import os
 import logging
+import uuid
 import subprocess
 logging.getLogger().setLevel(logging.INFO)
 import argparse
@@ -32,15 +33,15 @@ class DatabaseSerializer:
         # provides a way to reduce the generated scenarios for each param file for unittesting
         self._num_serialize_scenarios = num_serialize_scenarios 
 
-    def _process_folder(self, dir):
+    def _process_folder(self, databasedir):
         process_result = True
-        for root, dirs, files in os.walk(dir):
+        for root, dirs, files in os.walk(databasedir):
             for name in files:
                 if name.endswith(".json"):
                     process_result = process_result and \
                            self._process_json_paramfile(os.path.join(root, name))
-            for dir in dirs:
-                process_result = process_result and self._process_folder(dir)
+            for sub_dir in dirs:
+                process_result = process_result and self._process_folder(sub_dir)
         return process_result
 
     def _process_json_paramfile(self, param_filename, json=None):
@@ -51,15 +52,18 @@ class DatabaseSerializer:
         if self._num_serialize_scenarios:
             # set this down to reduce test runtime !Only for Unittesting!
             param_server["Scenario"]["Generation"]["NumScenarios"] = self._num_serialize_scenarios 
-
+        current_dir = os.getcwd()
+        os.chdir(self._database_dir)
         scenario_set_serializer = ScenarioSetSerializer(params=param_server)
-        scenario_set_serializer.dump(os.path.dirname(param_filename))
+        scenario_set_serializer.dump(os.path.relpath(os.path.dirname(param_filename), self._database_dir))
         scenario_set_serializer.load()
-        return scenario_set_serializer.test(num_scenarios=self._test_scenarios,
+        test_result = scenario_set_serializer.test(num_scenarios=self._test_scenarios,
                                      num_steps=self._test_world_steps,
                                      visualize_test=self._visualize_tests,
                                      viewer=self._viewer,
                                      test_scenario_idxs=self._test_scenario_idxs)
+        os.chdir(current_dir)
+        return test_result
     
     def _process_scenario_list(self, database_dir, scenario_set_dict):
         serialized_sets_dir = os.path.join(database_dir, "scenario_sets")
@@ -95,17 +99,15 @@ class DatabaseSerializer:
     def _pack(database_dir, packed_file_name):
         logging.info('The following list of files will be released:')
         zipf = zipfile.ZipFile(packed_file_name, 'w', zipfile.ZIP_DEFLATED)
-        tmp_dir = "/tmp/database/"  
-        if os.path.exists(tmp_dir):
-            shutil.rmtree(tmp_dir)
+        tmp_dir = "/tmp/bark_packed_databases/{}".format(uuid.uuid4())
         shutil.copytree(database_dir, tmp_dir) # copy to resolve symlinks
         for root, dirs, files in os.walk(tmp_dir):
             for file in files:
                 if file.endswith(".zip"):
-                    continue # do not include our own created zip file
-                zip_root = root.replace("/tmp/","")
+                    continue # do not include our own created zip file or BUILD
+                zip_root = root.replace(tmp_dir,"")
                 logging.info(os.path.join(zip_root, file))
-                zipf.write(os.path.join(zip_root, file))
+                zipf.write(os.path.join(root, file), zip_root)
         logging.info("Packed release file {}".format(os.path.abspath(packed_file_name)))
 
     @staticmethod
@@ -131,7 +133,7 @@ class DatabaseSerializer:
         if not self._database_dir:
             logging.error("No database dir given, call process first.")
 
-        packed_file_name = os.path.join(self._database_dir,"{}.{}".format(
+        packed_file_name = os.path.join(os.path.dirname(self._database_dir),"{}.{}".format(
             DatabaseSerializer._release_file_name(version), "zip"))
         DatabaseSerializer._pack(self._database_dir, packed_file_name)
 

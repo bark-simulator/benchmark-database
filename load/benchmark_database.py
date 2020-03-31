@@ -10,6 +10,7 @@ import shutil
 logging.getLogger().setLevel(logging.INFO)
 import pickle
 import zipfile
+import uuid
 
 from modules.runtime.scenario.scenario_generation.scenario_generation import ScenarioGeneration
 from modules.runtime.commons.parameters import ParameterServer
@@ -37,12 +38,12 @@ class BenchmarkDatabase:
             logging.error("Given database root does not exist")
             return
         if database_root.endswith("zip"):
-            logging.info("extracting zipped-database {} to temporary directory /tmp/database".format(database_root))
-            shutil.rmtree("/tmp/database")
-            os.makedirs("/tmp/database")
+            tmp_dir_name = "/tmp/bark_extracted_databases_{}".format(uuid.uuid4())
+            logging.info("extracting zipped-database {} to temporary directory {}".format(database_root, tmp_dir_name))
+            os.makedirs(tmp_dir_name)
             with zipfile.ZipFile(database_root, 'r') as zip_obj:
-                zip_obj.extractall('/tmp/database')
-            self.database_root = '/tmp/database'
+                zip_obj.extractall(tmp_dir_name)
+            self.database_root = tmp_dir_name
 
         # parse recursively all info dictionaries in database into pandas table
         self.dataframe = pd.DataFrame()

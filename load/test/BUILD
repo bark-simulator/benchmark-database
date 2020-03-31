@@ -3,7 +3,7 @@ py_test(
   name = "database_load_local_test",
   srcs = ["database_load_local_test.py"],
   data = ['@bark_project//python:bark.so',
-          '//database:database'],
+          '//data/database1:database1'],
   imports = ['../python/'],
   deps = ["//load:benchmark_database",
           "//serialization:database_serializer"],

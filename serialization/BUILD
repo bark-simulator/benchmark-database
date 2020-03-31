@@ -25,7 +25,7 @@ py_binary(
   name = "release",
   srcs = ["release.py"],
   data = ['@bark_project//python:bark.so',
-          '//database:database'],
+          '//data/data2/database2:database2'],
   imports = ['../python/'],
   deps = [":database_serializer"],
   visibility = ["//visibility:public"],
