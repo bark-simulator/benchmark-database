@@ -38,7 +38,7 @@ class BenchmarkDatabase:
             logging.error("Given database root does not exist")
             return
         if database_root.endswith("zip"):
-            tmp_dir_name = "/tmp/bark_extracted_databases_{}".format(uuid.uuid4())
+            tmp_dir_name = "/tmp/bark_extracted_databases/{}".format(uuid.uuid4())
             logging.info("extracting zipped-database {} to temporary directory {}".format(database_root, tmp_dir_name))
             os.makedirs(tmp_dir_name)
             with zipfile.ZipFile(database_root, 'r') as zip_obj:

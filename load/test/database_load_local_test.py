@@ -15,7 +15,7 @@ class DatabaseSerializerTests(unittest.TestCase):
     def test_database_from_local_release(self):
         # release the database
         dbs = DatabaseSerializer(test_scenarios=1, test_world_steps=10, num_serialize_scenarios=1)
-        dbs.process("database")
+        dbs.process("data/database1")
         local_release_filename = dbs.release(version="0.0.1")
 
     
@@ -24,7 +24,7 @@ class DatabaseSerializerTests(unittest.TestCase):
         scenario_generation, _ = db.get_scenario_generator(scenario_set_id=0)
         self.assertEqual(db.get_num_scenario_sets(), 2)
 
-        db_filtered = db.apply_filter("_1")
+        db_filtered = db.apply_filter("40")
         self.assertEqual(db_filtered.get_num_scenario_sets(), 1)
 
         for scenario_generation, _ in db:

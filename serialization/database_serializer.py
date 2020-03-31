@@ -101,13 +101,14 @@ class DatabaseSerializer:
         zipf = zipfile.ZipFile(packed_file_name, 'w', zipfile.ZIP_DEFLATED)
         tmp_dir = "/tmp/bark_packed_databases/{}".format(uuid.uuid4())
         shutil.copytree(database_dir, tmp_dir) # copy to resolve symlinks
-        for root, dirs, files in os.walk(tmp_dir):
+        for subdir, dirs, files in os.walk(tmp_dir):
             for file in files:
-                if file.endswith(".zip"):
+                filepath = os.path.join(subdir, file)
+                if filepath.endswith(".zip"):
                     continue # do not include our own created zip file or BUILD
-                zip_root = root.replace(tmp_dir,"")
+                zip_root = filepath.replace(tmp_dir,"")
                 logging.info(os.path.join(zip_root, file))
-                zipf.write(os.path.join(root, file), zip_root)
+                zipf.write(os.path.join(subdir, file), zip_root)
         logging.info("Packed release file {}".format(os.path.abspath(packed_file_name)))
 
     @staticmethod

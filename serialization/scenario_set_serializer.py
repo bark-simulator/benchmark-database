@@ -67,8 +67,9 @@ class ScenarioSetSerializer:
         self._scenario_generator.dump_scenario_list(filename)
         self._last_serialized_filename = filename
 
+        param_file_name = os.path.join(dir, os.path.basename(self._params.param_filename))
         info_dict = {"GeneratorName": generator, "SetName": self._set_name, "NumScenarios": num_scenarios,
-                     "Seed": seed, "Serialized": filename, "Params": self._params.param_filename, **kwargs}
+                     "Seed": seed, "Serialized": filename, "Params": param_file_name, **kwargs}
 
         info_filename = os.path.join(dir, ScenarioSetSerializer.scenario_set_info_filename(self._set_name))
         with open(info_filename, "wb") as f:
