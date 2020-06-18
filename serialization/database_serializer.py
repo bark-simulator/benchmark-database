@@ -12,7 +12,7 @@ import argparse
 import zipfile
 import shutil
 
-from modules.runtime.commons.parameters import ParameterServer
+from bark.runtime.commons.parameters import ParameterServer
 from serialization.scenario_set_serializer import ScenarioSetSerializer
 FILE_EXTENSION_SCENARIO_SET = "bark_scenarios"
 

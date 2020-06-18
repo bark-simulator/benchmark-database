@@ -65,7 +65,7 @@ for scenario_generator, scenario_set_name in self.benchmark_database:
 
 
 ## How to add your own scenarios?
-The creation of scenario sets relies on the ScenarioGeneration base class defined in `modules/runtime/scenario/scenario_generation`.
+The creation of scenario sets relies on the ScenarioGeneration base class defined in `bark/runtime/scenario/scenario_generation`.
 Derive your own scenario generation class and put the created parameter file into the scenario_set direcotry - 
 a new subfolder.
 

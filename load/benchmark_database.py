@@ -12,8 +12,8 @@ import pickle
 import zipfile
 import uuid
 
-from modules.runtime.scenario.scenario_generation.scenario_generation import ScenarioGeneration
-from modules.runtime.commons.parameters import ParameterServer
+from bark.runtime.scenario.scenario_generation.scenario_generation import ScenarioGeneration
+from bark.runtime.commons.parameters import ParameterServer
 from serialization.scenario_set_serializer import ScenarioSetSerializer
 
 FILE_EXTENSION_SCENARIO_SET = "bark_scenarios"

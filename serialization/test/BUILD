@@ -4,7 +4,7 @@ py_test(
   srcs = ["scenario_set_serializer_test.py"],
   data = ['@bark_project//python:bark.so',
           '//data/database1:database1'],
-  imports = ['../python/'],
+  imports = [],
   deps = ["//serialization:scenario_set_serializer"],
 )
 
@@ -14,6 +14,6 @@ py_test(
   data = ['@bark_project//python:bark.so',
           '//data/database1:database1',
           '//data/data2/database2:database2'],
-  imports = ['../python/'],
+  imports = [],
   deps = ["//serialization:database_serializer"],
 )

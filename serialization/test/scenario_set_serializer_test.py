@@ -7,7 +7,7 @@ import unittest
 import os
 import matplotlib
 from serialization.scenario_set_serializer import ScenarioSetSerializer
-from modules.runtime.commons.parameters import ParameterServer
+from bark.runtime.commons.parameters import ParameterServer
 
 class ScenarioSetSerializerTests(unittest.TestCase):
     def test_highway_merging(self):
