@@ -117,7 +117,7 @@ class ScenarioSetSerializer:
                 logging.error("Deserialization failed with {}.".format(e))
                 return False
             try:
-                world_state = scenario.get_world_state()
+                world_state = scenario.GetWorldState()
             except Exception as e:
                 logging.error("Get world state failed with {}.".format(e))
                 return False
