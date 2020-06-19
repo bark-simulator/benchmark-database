@@ -20,7 +20,7 @@ cc_library(
     _maybe(
     git_repository,
     name = "bark_project",
-    commit="802cd341f46815171e366d6fc22fb87a25d85e87",
+    commit="c5ed33c334e4b763574bd9053f04cbdc8f380a5f",
     remote = "https://github.com/bark-simulator/bark",
     )
 
