@@ -10,12 +10,7 @@ import pickle
 import time
 
 
-from bark.runtime.scenario.scenario_generation.scenario_generation import ScenarioGeneration
-from bark.runtime.scenario.scenario_generation.uniform_vehicle_distribution import UniformVehicleDistribution
-from bark.runtime.scenario.scenario_generation.deterministic import DeterministicScenarioGeneration
-from bark.runtime.scenario.scenario_generation.configurable_scenario_generation import ConfigurableScenarioGeneration
-from bark.runtime.scenario.scenario_generation.interaction_dataset_scenario_generation import InteractionDatasetScenarioGeneration
-from bark.runtime.scenario.scenario_generation.interaction_dataset_scenario_generation_full import InteractionDatasetScenarioGenerationFull
+from bark.runtime.scenario.scenario_generation import *
 
 from bark.runtime.commons.parameters import ParameterServer
 from bark.runtime.viewer.matplotlib_viewer import MPViewer
