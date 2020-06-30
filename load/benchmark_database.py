@@ -70,8 +70,10 @@ class BenchmarkDatabase:
             serialized_file_path = serialized_file_name
         else:
             serialized_file_path = os.path.join(self.database_root, serialized_file_name)
+        cwd = None
         if os.path.exists(self.database_root):
             # move into database root that map files can be found
+            cwd = os.getcwd()
             os.chdir(self.database_root)
         param_file_name = self.dataframe.iloc[scenario_set_id]["Params"]
         if not param_file_name:
@@ -80,8 +82,12 @@ class BenchmarkDatabase:
             params = ParameterServer()
         else:
             params=ParameterServer(filename=param_file_name)
+
         scenario_generation = ScenarioGeneration(params=params)
         scenario_generation.load_scenario_list(filename=serialized_file_name)
+        scenario_generation.update_map_base_dir(self.database_root)
+        if cwd:
+          os.chdir(cwd)
         scenario_set_name = self.dataframe.iloc[scenario_set_id]["SetName"]
         return scenario_generation, scenario_set_name
 
