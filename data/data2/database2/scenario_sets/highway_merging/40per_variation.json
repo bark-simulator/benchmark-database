@@ -55,6 +55,10 @@
             "GeneratorSeed": 2000,
             "SetName": "40per_variation",
             "SetDescription": "Ego vehicle is the only vehicle on the right lane. Must merge to left lane where it is crowded with IDM vehicles",
+            "SetParameters": {
+                "Test1": 1509,
+                "Test2":1.5
+            },
             "NumScenarios": 100,
             "NumSets": 1,
             "ConfigurableScenarioGeneration": {

@@ -91,7 +91,8 @@ class BenchmarkDatabase:
         if cwd:
             os.chdir(cwd)
         scenario_set_name = self.dataframe.iloc[scenario_set_id]["SetName"]
-        return scenario_generation, scenario_set_name
+        scenario_set_parameters = self.dataframe.iloc[scenario_set_id]["SetParameters"]
+        return scenario_generation, scenario_set_name, scenario_set_parameters
 
     def __iter__(self):
         self.current_iter_idx = 0

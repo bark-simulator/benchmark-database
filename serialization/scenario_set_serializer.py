@@ -31,6 +31,7 @@ class ScenarioSetSerializer:
         self._generator_seed = self._params["Scenario"]["Generation"]["GeneratorSeed"]
         self._num_scenarios = self._params["Scenario"]["Generation"]["NumScenarios"]
         self._set_name = self._params["Scenario"]["Generation"]["SetName"]
+        self._set_parameters = self._params["Scenario"]["Generation"]["SetParameters"].ConvertToDict()
         self._simulation_step_time = self._params["Simulation"]["StepTime"]
         self._scenario_generator = None
         self._last_serialized_filename = None
@@ -67,7 +68,7 @@ class ScenarioSetSerializer:
         param_file_name = os.path.join(
             dir, os.path.basename(self._params.param_filename))
         info_dict = {"GeneratorName": generator, "SetName": self._set_name, "NumScenarios": num_scenarios,
-                     "Seed": seed, "Serialized": filename, "Params": param_file_name, **kwargs}
+                     "Seed": seed, "Serialized": filename, "Params": param_file_name, "SetParameters": self._set_parameters, **kwargs}
 
         info_filename = os.path.join(
             dir, ScenarioSetSerializer.scenario_set_info_filename(self._set_name))
