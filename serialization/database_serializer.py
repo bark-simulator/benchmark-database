@@ -99,7 +99,7 @@ class DatabaseSerializer:
     def _pack(database_dir, packed_file_name):
         logging.info('The following list of files will be released:')
         zipf = zipfile.ZipFile(packed_file_name, 'w', zipfile.ZIP_DEFLATED)
-        tmp_dir = "/tmp/bark_packed_databases/{}".format(uuid.uuid4())
+        tmp_dir = "./tmp/bark_packed_databases/{}".format(uuid.uuid4())
         shutil.copytree(database_dir, tmp_dir) # copy to resolve symlinks
         for subdir, dirs, files in os.walk(tmp_dir):
             for file in files:
