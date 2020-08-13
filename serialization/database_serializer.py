@@ -5,6 +5,7 @@
 
 import os
 import logging
+import glob
 import uuid
 import subprocess
 logging.getLogger().setLevel(logging.INFO)
@@ -33,15 +34,16 @@ class DatabaseSerializer:
         # provides a way to reduce the generated scenarios for each param file for unittesting
         self._num_serialize_scenarios = num_serialize_scenarios 
 
-    def _process_folder(self, databasedir):
-        process_result = True
-        for root, dirs, files in os.walk(databasedir):
-            for name in files:
-                if name.endswith(".json"):
-                    process_result = process_result and \
-                           self._process_json_paramfile(os.path.join(root, name))
-            for sub_dir in dirs:
-                process_result = process_result and self._process_folder(sub_dir)
+    def _process_folder(self, databasedir, filter_sets=None):
+        process_result = 0
+        if filter_sets:
+            files = glob.glob(os.path.join(databasedir, filter_sets), recursive=True)
+        else:
+            files = glob.glob(os.path.join(databasedir, "**/*.json"), recursive=True)
+        for name in files:
+            if name.endswith(".json"):
+                if self._process_json_paramfile(name):
+                    process_result +=1
         return process_result
 
     def _process_json_paramfile(self, param_filename, json=None):
@@ -80,10 +82,10 @@ class DatabaseSerializer:
                     self._process_json_paramfile(filename, json=json_params)
         return process_result
 
-    def process(self, database_dir, scenario_set_dict=None):
+    def process(self, database_dir, scenario_set_dict=None, filter_sets=None):
         if not scenario_set_dict:
             self._database_dir = database_dir
-            succ = self._process_folder(database_dir)
+            succ = self._process_folder(database_dir, filter_sets)
         elif database_dir and scenario_set_dict:
             self._database_dir = database_dir # TODO(@Klemens): use serialized_sets_dir?
             succ = self._process_scenario_list(database_dir, scenario_set_dict)

@@ -24,7 +24,7 @@ py_library(
 py_binary(
   name = "release",
   srcs = ["release.py"],
-  data = ['@bark_project//bark/python_wrapper:core.so',
+  data = ['@bark_project//bark:generate_core',
           '//data/data2/database2:database2'],
   imports = [],
   deps = [":database_serializer"],
