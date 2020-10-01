@@ -213,8 +213,8 @@
                                 0.5
                             ],
                             "LongitudinalRange": [
-                                0.2,
-                                1
+                                0.8,
+                                1.0
                             ],
                             "MaxOrientationDifference": [
                                 0.08,
