@@ -35,6 +35,7 @@ class DatabaseSerializer:
         self._num_serialize_scenarios = num_serialize_scenarios 
 
     def _process_folder(self, databasedir, filter_sets=None):
+        self._clean_old_files(databasedir)
         process_result = 0
         if filter_sets:
             files = glob.glob(os.path.join(databasedir, filter_sets), recursive=True)
@@ -45,6 +46,13 @@ class DatabaseSerializer:
                 if self._process_json_paramfile(name):
                     process_result +=1
         return process_result
+
+    def _clean_old_files(self, databasedir):
+        file_types_to_clean = ["**/*.bark_scenarios", "**/set_info_*"]
+        for file_type in file_types_to_clean:
+            files = glob.glob(os.path.join(databasedir, file_type), recursive=True)
+            for file in files:
+                os.remove(file)
 
     def _process_json_paramfile(self, param_filename, json=None):
         if json:
