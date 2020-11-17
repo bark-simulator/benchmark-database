@@ -98,17 +98,18 @@ class DatabaseSerializer:
         return "benchmark_database_{}".format(version)
 
     @staticmethod
-    def _pack(database_dir, packed_file_name):
+    def _pack(database_dir, packed_file_name, tmp_dir=None):
         logging.info('The following list of files will be released:')
         zipf = zipfile.ZipFile(packed_file_name, 'w', zipfile.ZIP_DEFLATED)
-        tmp_dir = "/tmp/bark_packed_databases/{}".format(uuid.uuid4())
-        shutil.copytree(database_dir, tmp_dir) # copy to resolve symlinks
-        for subdir, dirs, files in os.walk(tmp_dir):
+        tmp_dir = tmp_dir or "/tmp"
+        packing_folder = os.path.join(tmp_dir, "packed_databases/{}".format(uuid.uuid4()))
+        shutil.copytree(database_dir, packing_folder) # copy to resolve symlinks
+        for subdir, dirs, files in os.walk(packing_folder):
             for file in files:
                 filepath = os.path.join(subdir, file)
                 if filepath.endswith(".zip"):
                     continue # do not include our own created zip file or BUILD
-                zip_root = filepath.replace(tmp_dir,"")
+                zip_root = filepath.replace(packing_folder,"")
                 logging.info(os.path.join(zip_root, file))
                 zipf.write(os.path.join(subdir, file), zip_root)
         logging.info("Packed release file {}".format(os.path.abspath(packed_file_name)))
@@ -128,7 +129,7 @@ class DatabaseSerializer:
         out = subprocess.call(ghr_full_command, shell=True)
         logging.info("Release output {}".format(out))
 
-    def release(self, version, github_token=None, delete=False):
+    def release(self, version, github_token=None, delete=False, tmp_dir = None):
         if self._num_serialize_scenarios:
             logging.warning("Do not set down the number of serialized scenarios in a release \
                     -> set serialized_scenarios=None")
@@ -138,7 +139,7 @@ class DatabaseSerializer:
 
         packed_file_name = os.path.join(os.path.dirname(self._database_dir),"{}.{}".format(
             DatabaseSerializer._release_file_name(version), "zip"))
-        DatabaseSerializer._pack(self._database_dir, packed_file_name)
+        DatabaseSerializer._pack(self._database_dir, packed_file_name, tmp_dir)
 
         if github_token:
             DatabaseSerializer._github_release(packed_file_name, version, github_token, delete)

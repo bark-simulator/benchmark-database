@@ -21,29 +21,29 @@ logging.getLogger().setLevel(logging.INFO)
 
 
 class BenchmarkDatabase:
-    def __init__(self, database_root=None, dataframe=None):
+    def __init__(self, database_root=None, dataframe=None, tmp_dir=None):
         if database_root and not isinstance(dataframe, pd.DataFrame):
-            self._init_from_database_root(database_root)
+            self._init_from_database_root(database_root, tmp_dir)
         elif isinstance(dataframe, pd.DataFrame) and database_root:
             self._init_from_dataframe(dataframe, database_root)
         else:
             raise ValueError("Invalid argument combination \
                         for initialization of database")
 
-    def _init_from_database_root(self, database_root):
+    def _init_from_database_root(self, database_root, tmp_dir=None):
         self.database_root = database_root
         if not os.path.exists(database_root):
             logging.error("Given database root does not exist")
             return
         if database_root.endswith("zip"):
-            tmp_dir_name = "/tmp/bark_extracted_databases/{}".format(
-                uuid.uuid4())
+            tmp_dir = tmp_dir or "/tmp"
+            extraction_folder = os.path.join(tmp_dir, "extracted_databases/{}".format(uuid.uuid4()))
             logging.info(
-                "extracting zipped-database {} to temporary directory {}".format(database_root, tmp_dir_name))
-            os.makedirs(tmp_dir_name)
+                "extracting zipped-database {} to temporary directory {}".format(database_root, extraction_folder))
+            os.makedirs(extraction_folder)
             with zipfile.ZipFile(database_root, 'r') as zip_obj:
-                zip_obj.extractall(tmp_dir_name)
-            self.database_root = tmp_dir_name
+                zip_obj.extractall(extraction_folder)
+            self.database_root = extraction_folder
 
         # parse recursively all info dictionaries in database into pandas table
         self.dataframe = pd.DataFrame()
