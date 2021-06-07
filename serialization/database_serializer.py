@@ -35,7 +35,6 @@ class DatabaseSerializer:
         self._num_serialize_scenarios = num_serialize_scenarios 
 
     def _process_folder(self, databasedir, filter_sets=None):
-        self._clean_old_files(databasedir)
         process_result = 0
         if filter_sets:
             files = glob.glob(os.path.join(databasedir, filter_sets), recursive=True)
@@ -95,9 +94,11 @@ class DatabaseSerializer:
         if not os.path.exists(serialized_sets_dir):
             os.makedirs(serialized_sets_dir)
         process_result = True
+        current_dir = os.getcwd()
+        os.chdir(database_dir)
         for idx, scenario_generator in enumerate(scenario_generator_list):
             scenario_set_serializer = ScenarioSetSerializer(scenario_generator=scenario_generator)
-            scenario_set_serializer.dump(os.path.join(serialized_sets_dir, f"idx{idx}"))
+            scenario_set_serializer.dump(os.path.relpath(serialized_sets_dir, database_dir))
             scenario_set_serializer.load()
             process_result = process_result and \
                      scenario_set_serializer.test(num_scenarios=self._test_scenarios,
@@ -105,9 +106,11 @@ class DatabaseSerializer:
                                      visualize_test=self._visualize_tests,
                                      viewer=self._viewer,
                                      test_scenario_idxs=self._test_scenario_idxs)
+        os.chdir(current_dir)
         return process_result
 
     def process(self, database_dir, scenario_set_dict=None, scenario_generator_list=None, filter_sets=None):
+        self._clean_old_files(database_dir)
         if not scenario_set_dict and not scenario_generator_list:
             self._database_dir = database_dir
             succ = self._process_folder(database_dir, filter_sets)
@@ -173,6 +176,6 @@ class DatabaseSerializer:
             DatabaseSerializer._github_release(packed_file_name, version, github_token, delete)
         else:
             logging.info("Assuming local release as you did not provide a github token.")
-
+        self._clean_old_files(self._database_dir)
         return packed_file_name
 
