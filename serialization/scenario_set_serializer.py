@@ -25,15 +25,22 @@ FILE_EXTENSION_SCENARIO_SET = "bark_scenarios"
 
 
 class ScenarioSetSerializer:
-    def __init__(self, params):
+    def __init__(self, params=None, scenario_generator=None):
+
         self._params = params
-        self._scenario_generator_name = self._params["Scenario"]["Generation"]["GeneratorName"]
+        if not params:
+            self._params = scenario_generator.params
+            self._scenario_generator_name = scenario_generator.__class__.__name__
+            self._scenario_generator = scenario_generator
+        else: 
+            self._params = params
+            self._scenario_generator_name = self._params["Scenario"]["Generation"]["GeneratorName"]
+            self._scenario_generator = None
         self._generator_seed = self._params["Scenario"]["Generation"]["GeneratorSeed"]
         self._num_scenarios = self._params["Scenario"]["Generation"]["NumScenarios"]
         self._set_name = self._params["Scenario"]["Generation"]["SetName"]
         self._set_parameters = self._params["Scenario"]["Generation"]["SetParameters"].ConvertToDict()
         self._simulation_step_time = self._params["Simulation"]["StepTime"]
-        self._scenario_generator = None
         self._last_serialized_filename = None
 
     @staticmethod
@@ -53,10 +60,11 @@ class ScenarioSetSerializer:
                    self._num_scenarios, self._generator_seed)
 
     def _dump(self, dir, generator, num_scenarios, seed, **kwargs):
-        self._scenario_generator = eval("{}( \
-                num_scenarios={}, params=self._params, random_seed={})".format(self._scenario_generator_name,
-                                                                               self._num_scenarios,
-                                                                               self._generator_seed))
+        if not self._scenario_generator:
+            self._scenario_generator = eval("{}( \
+                    num_scenarios={}, params=self._params, random_seed={})".format(self._scenario_generator_name,
+                                                                                self._num_scenarios,
+                                                                                self._generator_seed))
         filename = os.path.join(dir, ScenarioSetSerializer.scenario_file_name(
             self._set_name, self._num_scenarios, self._generator_seed
         ))
@@ -65,8 +73,11 @@ class ScenarioSetSerializer:
         self._scenario_generator.dump_scenario_list(filename)
         self._last_serialized_filename = filename
 
-        param_file_name = os.path.join(
-            dir, os.path.basename(self._params.param_filename))
+        if self._params.param_filename:
+          param_file_name = os.path.join(
+              dir, os.path.basename(self._params.param_filename))
+        else:
+          param_file_name = ""
         info_dict = {"GeneratorName": generator, "SetName": self._set_name, "NumScenarios": num_scenarios,
                      "Seed": seed, "Serialized": filename, "Params": param_file_name, "SetParameters": self._set_parameters, **kwargs}
 

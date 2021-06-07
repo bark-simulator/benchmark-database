@@ -90,13 +90,33 @@ class DatabaseSerializer:
                     self._process_json_paramfile(filename, json=json_params)
         return process_result
 
-    def process(self, database_dir, scenario_set_dict=None, filter_sets=None):
-        if not scenario_set_dict:
+    def _process_scenario_generators(self, database_dir, scenario_generator_list):
+        serialized_sets_dir = os.path.join(database_dir, "scenario_sets", "from_scenario_generation")
+        if not os.path.exists(serialized_sets_dir):
+            os.makedirs(serialized_sets_dir)
+        process_result = True
+        for idx, scenario_generator in enumerate(scenario_generator_list):
+            scenario_set_serializer = ScenarioSetSerializer(scenario_generator=scenario_generator)
+            scenario_set_serializer.dump(os.path.join(serialized_sets_dir, f"idx{idx}"))
+            scenario_set_serializer.load()
+            process_result = process_result and \
+                     scenario_set_serializer.test(num_scenarios=self._test_scenarios,
+                                     num_steps=self._test_world_steps,
+                                     visualize_test=self._visualize_tests,
+                                     viewer=self._viewer,
+                                     test_scenario_idxs=self._test_scenario_idxs)
+        return process_result
+
+    def process(self, database_dir, scenario_set_dict=None, scenario_generator_list=None, filter_sets=None):
+        if not scenario_set_dict and not scenario_generator_list:
             self._database_dir = database_dir
             succ = self._process_folder(database_dir, filter_sets)
         elif database_dir and scenario_set_dict:
             self._database_dir = database_dir # TODO(@Klemens): use serialized_sets_dir?
             succ = self._process_scenario_list(database_dir, scenario_set_dict)
+        elif database_dir and scenario_generator_list:
+            self._database_dir = database_dir # TODO(@Klemens): use serialized_sets_dir?
+            succ = self._process_scenario_generators(database_dir, scenario_generator_list)
         else:
             raise ValueError("Invalid argument combination.")
         return succ
